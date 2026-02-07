@@ -1870,7 +1870,7 @@
 
     .shop-item.locked {
       opacity: 0.6;
-      grayscale: 100%;
+      filter: grayscale(100%);
       cursor: not-allowed;
     }
 
@@ -2842,7 +2842,8 @@
     // ===== GAME STATE =====
     let state = {
       playerName: '', operation: 'add',
-      score: 0, streak: 0, bestStreak: 0, level: 1,
+      score: 0, totalStars: 0, // Score is session, totalStars is lifetime
+      streak: 0, bestStreak: 0, level: 1,
       questionsAnswered: 0, questionsCorrect: 0,
       totalQuestions: 15, currentAnswer: '',
       correctAnswer: 0, wrongStreak: 0, waiting: false,
@@ -2855,7 +2856,7 @@
       const key = `labubu_progress_${state.playerName.toLowerCase()}`;
       const data = {
         level: state.level,
-        score: state.score, // Total stars
+        totalStars: state.totalStars,
         bestStreak: state.bestStreak,
         unlockedItems: state.unlockedItems || [],
         equippedItem: state.equippedItem || null,
@@ -2873,7 +2874,8 @@
           const data = JSON.parse(saved);
           // Only restore persistent stats, not current game session state (like current streak)
           state.level = data.level || 1;
-          state.score = data.score || 0;
+          // Migration: if totalStars doesn't exist, use old score
+          state.totalStars = data.totalStars !== undefined ? data.totalStars : (data.score || 0);
           state.bestStreak = data.bestStreak || 0;
           state.unlockedItems = data.unlockedItems || [];
           state.equippedItem = data.equippedItem || null;
@@ -2916,7 +2918,7 @@
 
     function openShop() {
       document.getElementById('shopOverlay').classList.add('show');
-      document.getElementById('shopStars').textContent = state.score;
+      document.getElementById('shopStars').textContent = state.totalStars;
       renderShop();
     }
 
@@ -2938,7 +2940,7 @@
 
         const isOwned = (state.unlockedItems && state.unlockedItems.includes(item.id)) || item.cost === 0;
         const isEquipped = (item.type === 'item' && state.equippedItem === item.id) || (item.type === 'theme' && ((item.id === 'jungle' && state.theme === 'default') || state.theme === item.id));
-        const canAfford = state.score >= item.cost;
+        const canAfford = state.totalStars >= item.cost;
         const isLocked = !isOwned && !canAfford;
 
         if (isOwned) el.classList.add('owned');
@@ -2973,9 +2975,9 @@
       if (!isOwned) {
         // Unlock it
         // Note: We don't spend stars, we just check if they have enough "Life Time" stars.
-        // Wait, implementation plan said "Unlock at X Stars". 
+        // Wait, implementation plan said "Unlock at X Stars".
         // So we don't deduct cost. Just check threshold.
-        if (state.score >= item.cost) {
+        if (state.totalStars >= item.cost) {
           if (!state.unlockedItems) state.unlockedItems = [];
           state.unlockedItems.push(item.id);
           saveGameState();
@@ -3136,7 +3138,7 @@
       if (word === state.correctAnswer) {
         // CORRECT
         btn.classList.add('correct');
-        state.score++; state.streak++; state.questionsCorrect++; state.wrongStreak = 0;
+        state.score++; state.totalStars++; state.streak++; state.questionsCorrect++; state.wrongStreak = 0;
         if (state.streak > state.bestStreak) state.bestStreak = state.streak;
 
         playCorrectSound();
@@ -3383,7 +3385,7 @@
 
       if (userWord === currentSpellWord) {
         // Correct!
-        state.score++; state.streak++; state.questionsCorrect++;
+        state.score++; state.totalStars++; state.streak++; state.questionsCorrect++;
         if (state.streak > state.bestStreak) state.bestStreak = state.streak;
 
         // Visuals
@@ -3575,6 +3577,7 @@
       if (userAnswer === state.correctAnswer) {
         // ===== CORRECT =====
         state.score++;
+        state.totalStars++;
         state.streak++;
         state.questionsCorrect++;
         state.wrongStreak = 0;

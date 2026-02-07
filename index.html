@@ -1103,6 +1103,86 @@
       }
     }
 
+    /* ===== INTERACTIVE LABUBU ===== */
+    .labubu.interactive {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .labubu.interactive:active {
+      transform: scale(0.95);
+    }
+
+    @keyframes labubuJump {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-40px) scale(1.1);
+      }
+    }
+
+    @keyframes labubuWiggle {
+
+      0%,
+      100% {
+        transform: rotate(0);
+      }
+
+      25% {
+        transform: rotate(-10deg);
+      }
+
+      75% {
+        transform: rotate(10deg);
+      }
+    }
+
+    @keyframes labubuSpin {
+      0% {
+        transform: rotate(0);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes labubuShake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-10px);
+      }
+
+      75% {
+        transform: translateX(10px);
+      }
+    }
+
+    .anim-jump {
+      animation: labubuJump 0.5s ease-out;
+    }
+
+    .anim-wiggle {
+      animation: labubuWiggle 0.5s ease-in-out;
+    }
+
+    .anim-spin {
+      animation: labubuSpin 0.6s linear;
+    }
+
+    .anim-shake {
+      animation: labubuShake 0.4s ease-in-out;
+    }
+
     /* ===== GAME SCREEN ===== */
     .game-header {
       display: flex;
@@ -2828,6 +2908,59 @@
       }
     }
     spawnBgStars();
+
+    // ===== INTERACTIVE LABUBU LOGIC =====
+    function initInteractiveLabubu() {
+      const labubus = document.querySelectorAll('.labubu');
+      labubus.forEach(l => {
+        l.classList.add('interactive');
+        l.addEventListener('click', (e) => {
+          e.stopPropagation(); // Don't trigger bg particles
+          handleLabubuClick(l, e);
+        });
+      });
+    }
+
+    let lastInteraction = 0;
+    function handleLabubuClick(el, e) {
+      const now = Date.now();
+      if (now - lastInteraction < 800) return; // Cooldown
+      lastInteraction = now;
+
+      const reactions = [
+        { type: 'jump', text: "Boing!", sound: 'jump' },
+        { type: 'wiggle', text: "Hee hee! That tickles!", sound: 'giggle' },
+        { type: 'spin', text: "Whoa!", sound: 'spin' },
+        { type: 'shake', text: "I love math!", sound: 'happy' }
+      ];
+
+      const reaction = reactions[randInt(0, reactions.length - 1)];
+
+      // Animation
+      el.classList.add(`anim-${reaction.type}`);
+      setTimeout(() => el.classList.remove(`anim-${reaction.type}`), 600);
+
+      // Sound/Speech
+      if (window.speechSynthesis) {
+        const utter = new SpeechSynthesisUtterance(reaction.text);
+        utter.pitch = 1.6; utter.rate = 1.2;
+        window.speechSynthesis.speak(utter);
+      }
+
+      // Particles
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2; // Center of Labubu
+      const cy = rect.top + rect.height / 3; // Near the head
+
+      let emojis = ['❤️', '✨'];
+      if (reaction.type === 'wiggle') emojis = ['😂', '🤣'];
+      if (reaction.type === 'spin') emojis = ['💫', '🌀'];
+
+      emojiBurst(emojis, cx, cy, 6); // More particles!
+    }
+
+    // Initialize after DOM load
+    setTimeout(initInteractiveLabubu, 1000);
 
     // ===== PARTICLES =====
     document.addEventListener('click', (e) => {

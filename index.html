@@ -2636,6 +2636,39 @@
       thinkTimer: null
     };
 
+    // ===== PERSISTENCE =====
+    function saveGameState() {
+      if (!state.playerName) return;
+      const key = `labubu_progress_${state.playerName.toLowerCase()}`;
+      const data = {
+        level: state.level,
+        score: state.score, // Total stars
+        bestStreak: state.bestStreak
+      };
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    function loadGameState() {
+      if (!state.playerName) return;
+      const key = `labubu_progress_${state.playerName.toLowerCase()}`;
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          // Only restore persistent stats, not current game session state (like current streak)
+          state.level = data.level || 1;
+          // We might want to keep score cumulative or session based? 
+          // Let's make score cumulative for "Total Stars" feel.
+          state.score = data.score || 0;
+          state.bestStreak = data.bestStreak || 0;
+
+          showBubble('selectBubble', `Welcome back, ${state.playerName}! Level ${state.level} 🌟`, 3000);
+        } catch (e) {
+          console.error("Failed to load save", e);
+        }
+      }
+    }
+
     // ===== SCREEN NAV =====
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -2646,10 +2679,21 @@
 
     function goToSelect() {
       state.playerName = document.getElementById('playerName').value.trim() || 'Friend';
+
+      // Load progress
+      loadGameState();
+
       document.getElementById('selectTitle').textContent =
         `What do you want to practice, ${state.playerName}?`;
       showScreen('selectScreen');
-      setTimeout(() => showBubble('selectBubble', `Let's go, ${state.playerName}! 💪`, 3000), 400);
+
+      // Only show bubble if loadGameState didn't already show one
+      setTimeout(() => {
+        const bubble = document.getElementById('selectBubble');
+        if (!bubble.classList.contains('show')) {
+          showBubble('selectBubble', `Let's go, ${state.playerName}! 💪`, 3000);
+        }
+      }, 400);
     }
 
     function quitGame() {
@@ -2785,6 +2829,8 @@
           showBubble('gameBubble', `${state.questionsCorrect} stars! 🌟`, 2500);
           setTimeout(() => document.getElementById('labubuHat').classList.remove('show'), 3000);
         }
+
+        saveGameState(); // Save on every correct answer to be safe
 
       } else {
         // WRONG
@@ -3035,6 +3081,8 @@
           showBubble('gameBubble', 'Level Up! ⬆️', 2000);
         }
 
+        saveGameState(); // Save progress
+
       } else {
         // Wrong
         state.streak = 0;
@@ -3274,6 +3322,8 @@
           setTimeout(() => speakRandom('milestone10'), 500);
         }
 
+        saveGameState(); // Save progress
+
       } else {
         // ===== WRONG =====
         state.streak = 0;
@@ -3291,6 +3341,7 @@
         if (state.wrongStreak >= 2 && state.level > 1) {
           state.level--;
           state.wrongStreak = 0;
+          saveGameState();
         }
       }
 

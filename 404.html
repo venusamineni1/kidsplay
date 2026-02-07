@@ -1,1524 +1,2767 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Labubu Math Adventure!</title>
-<link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Labubu Math Adventure!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Nunito:wght@700;900&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-:root {
-  --pink: #FFB6C1;
-  --purple: #C8A2C8;
-  --mint: #98D8C8;
-  --yellow: #FFE66D;
-  --coral: #FF7675;
-  --sky: #74B9FF;
-  --lavender: #DDA0DD;
-  --labubu-body: #A8D8EA;
-  --labubu-face: #FFF5E6;
-  --labubu-ear: #FFB6C1;
-  --bg-hue: 0;
-}
+    :root {
+      --pink: #FFB6C1;
+      --purple: #C8A2C8;
+      --mint: #98D8C8;
+      --yellow: #FFE66D;
+      --coral: #FF7675;
+      --sky: #74B9FF;
+      --lavender: #DDA0DD;
+      --labubu-body: #A8D8EA;
+      --labubu-face: #FFF5E6;
+      --labubu-ear: #FFB6C1;
+      --bg-hue: 0;
+    }
 
-body {
-  font-family: 'Bubblegum Sans', 'Nunito', cursive, sans-serif;
-  background: linear-gradient(135deg, #FFE6F0 0%, #E8D5F5 30%, #D5E8F5 60%, #E8F5E8 100%);
-  min-height: 100vh;
-  overflow-x: hidden;
-  color: #4A4A6A;
-  user-select: none;
-  animation: bgShift 20s ease-in-out infinite;
-}
-@keyframes bgShift {
-  0%, 100% { filter: hue-rotate(0deg); }
-  33% { filter: hue-rotate(15deg); }
-  66% { filter: hue-rotate(-10deg); }
-}
+    body {
+      font-family: 'Bubblegum Sans', 'Nunito', cursive, sans-serif;
+      background: linear-gradient(135deg, #FFE6F0 0%, #E8D5F5 30%, #D5E8F5 60%, #E8F5E8 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #4A4A6A;
+      user-select: none;
+      animation: bgShift 20s ease-in-out infinite;
+    }
 
-/* ===== FLOATING BACKGROUND ===== */
-.bg-elements { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    @keyframes bgShift {
 
-.cloud {
-  position: absolute;
-  background: rgba(255,255,255,0.6);
-  border-radius: 50px;
-  animation: floatCloud linear infinite;
-}
-.cloud::before, .cloud::after {
-  content: ''; position: absolute; background: inherit; border-radius: 50%;
-}
-.cloud::before { width: 60%; height: 80%; top: -40%; left: 15%; }
-.cloud::after { width: 40%; height: 60%; top: -25%; right: 15%; }
-.cloud:nth-child(1) { width: 120px; height: 40px; top: 10%; animation-duration: 25s; }
-.cloud:nth-child(2) { width: 80px; height: 28px; top: 25%; animation-duration: 35s; animation-delay: -10s; }
-.cloud:nth-child(3) { width: 100px; height: 35px; top: 60%; animation-duration: 30s; animation-delay: -20s; }
-.cloud:nth-child(4) { width: 60px; height: 22px; top: 75%; animation-duration: 40s; animation-delay: -5s; }
+      0%,
+      100% {
+        filter: hue-rotate(0deg);
+      }
 
-@keyframes floatCloud { from { left: -150px; } to { left: 110%; } }
+      33% {
+        filter: hue-rotate(15deg);
+      }
 
-.sparkle {
-  position: absolute; width: 6px; height: 6px;
-  background: var(--yellow); border-radius: 50%;
-  animation: twinkle 2s ease-in-out infinite;
-}
-.sparkle:nth-child(5) { top: 15%; left: 20%; }
-.sparkle:nth-child(6) { top: 30%; left: 70%; animation-delay: 0.5s; }
-.sparkle:nth-child(7) { top: 50%; left: 40%; animation-delay: 1s; }
-.sparkle:nth-child(8) { top: 70%; left: 80%; animation-delay: 1.5s; }
-.sparkle:nth-child(9) { top: 85%; left: 15%; animation-delay: 0.3s; }
-.sparkle:nth-child(10) { top: 40%; left: 90%; animation-delay: 0.8s; }
-.sparkle:nth-child(11) { top: 20%; left: 55%; animation-delay: 1.2s; }
+      66% {
+        filter: hue-rotate(-10deg);
+      }
+    }
 
-@keyframes twinkle {
-  0%, 100% { opacity: 0.3; transform: scale(0.5) rotate(0deg); }
-  50% { opacity: 1; transform: scale(1.4) rotate(180deg); }
-}
+    /* ===== FLOATING BACKGROUND ===== */
+    .bg-elements {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
 
-/* Floating stars in background */
-.bg-star {
-  position: absolute; font-size: 20px; opacity: 0.15;
-  animation: floatStar linear infinite;
-}
-@keyframes floatStar {
-  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-  10% { opacity: 0.2; }
-  90% { opacity: 0.2; }
-  100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
-}
+    .cloud {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50px;
+      animation: floatCloud linear infinite;
+    }
 
-/* ===== SCREENS ===== */
-.screen {
-  display: none; flex-direction: column; align-items: center; justify-content: center;
-  min-height: 100vh; padding: 20px; position: relative; z-index: 1;
-}
-.screen.active { display: flex; animation: screenIn 0.4s ease-out; }
-@keyframes screenIn {
-  0% { opacity: 0; transform: scale(0.95) translateY(15px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
-}
+    .cloud::before,
+    .cloud::after {
+      content: '';
+      position: absolute;
+      background: inherit;
+      border-radius: 50%;
+    }
 
-/* ===== LABUBU CHARACTER ===== */
-.labubu { position: relative; width: 160px; height: 180px; margin: 10px auto; }
+    .cloud::before {
+      width: 60%;
+      height: 80%;
+      top: -40%;
+      left: 15%;
+    }
 
-.labubu-body {
-  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 120px; height: 130px;
-  background: var(--labubu-body);
-  border-radius: 55px 55px 45px 45px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1), inset 0 -5px 15px rgba(0,0,0,0.05);
-}
+    .cloud::after {
+      width: 40%;
+      height: 60%;
+      top: -25%;
+      right: 15%;
+    }
 
-.labubu-ear {
-  position: absolute; width: 30px; height: 55px;
-  background: var(--labubu-ear);
-  border-radius: 50% 50% 30% 30%; top: -10px; z-index: 2;
-}
-.labubu-ear.left { left: 10px; transform: rotate(-20deg); }
-.labubu-ear.right { right: 10px; transform: rotate(20deg); }
-.labubu-ear::after {
-  content: ''; position: absolute; width: 60%; height: 70%;
-  background: #FFD1DC; border-radius: inherit; top: 15%; left: 20%;
-}
+    .cloud:nth-child(1) {
+      width: 120px;
+      height: 40px;
+      top: 10%;
+      animation-duration: 25s;
+    }
 
-.labubu-face {
-  position: absolute; width: 90px; height: 80px;
-  background: var(--labubu-face); border-radius: 50%;
-  top: 18px; left: 50%; transform: translateX(-50%); z-index: 3;
-  box-shadow: inset 0 -3px 8px rgba(0,0,0,0.04);
-}
+    .cloud:nth-child(2) {
+      width: 80px;
+      height: 28px;
+      top: 25%;
+      animation-duration: 35s;
+      animation-delay: -10s;
+    }
 
-.labubu-eye {
-  position: absolute; width: 20px; height: 22px;
-  background: #2D2D2D; border-radius: 50%; top: 22px; z-index: 4;
-  transition: all 0.3s ease;
-}
-.labubu-eye.left { left: 20px; }
-.labubu-eye.right { right: 20px; }
-.labubu-eye::before {
-  content: ''; position: absolute; width: 8px; height: 8px;
-  background: white; border-radius: 50%; top: 3px; left: 3px;
-  transition: all 0.3s;
-}
-.labubu-eye::after {
-  content: ''; position: absolute; width: 4px; height: 4px;
-  background: white; border-radius: 50%; bottom: 5px; right: 3px;
-}
+    .cloud:nth-child(3) {
+      width: 100px;
+      height: 35px;
+      top: 60%;
+      animation-duration: 30s;
+      animation-delay: -20s;
+    }
 
-.labubu-mouth {
-  position: absolute; bottom: 18px; left: 50%;
-  transform: translateX(-50%); width: 35px; height: 18px; z-index: 4;
-  transition: all 0.3s;
-}
-.labubu-mouth-shape {
-  width: 100%; height: 100%; background: #FF6B81;
-  border-radius: 0 0 20px 20px; position: relative; overflow: hidden;
-  transition: all 0.3s;
-}
-.labubu-teeth {
-  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  display: flex; gap: 2px;
-}
-.tooth { width: 7px; height: 8px; background: white; border-radius: 0 0 3px 3px; }
+    .cloud:nth-child(4) {
+      width: 60px;
+      height: 22px;
+      top: 75%;
+      animation-duration: 40s;
+      animation-delay: -5s;
+    }
 
-.labubu-blush {
-  position: absolute; width: 18px; height: 10px;
-  background: rgba(255, 150, 150, 0.5); border-radius: 50%;
-  top: 42px; z-index: 4; transition: all 0.3s;
-}
-.labubu-blush.left { left: 6px; }
-.labubu-blush.right { right: 6px; }
+    @keyframes floatCloud {
+      from {
+        left: -150px;
+      }
 
-.labubu-arm {
-  position: absolute; width: 25px; height: 50px;
-  background: var(--labubu-body); border-radius: 15px;
-  top: 55px; z-index: 1; transition: transform 0.3s;
-}
-.labubu-arm.left { left: -8px; transform: rotate(15deg); transform-origin: top center; }
-.labubu-arm.right { right: -8px; transform: rotate(-15deg); transform-origin: top center; }
+      to {
+        left: 110%;
+      }
+    }
 
-.labubu-foot {
-  position: absolute; width: 30px; height: 18px;
-  background: var(--labubu-body); border-radius: 50%; bottom: -5px; z-index: 1;
-}
-.labubu-foot.left { left: 18px; }
-.labubu-foot.right { right: 18px; }
+    .sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--yellow);
+      border-radius: 50%;
+      animation: twinkle 2s ease-in-out infinite;
+    }
 
-/* Speech bubble */
-.speech-bubble {
-  position: absolute; top: -55px; left: 50%; transform: translateX(-50%);
-  background: white; border-radius: 18px; padding: 6px 14px;
-  font-size: 0.85rem; white-space: nowrap; z-index: 20;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.12);
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.3s, transform 0.3s;
-}
-.speech-bubble.show {
-  opacity: 1; transform: translateX(-50%) translateY(-5px);
-  animation: bubblePop 0.3s ease-out;
-}
-.speech-bubble::after {
-  content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
-  border-left: 8px solid transparent; border-right: 8px solid transparent;
-  border-top: 10px solid white;
-}
-@keyframes bubblePop {
-  0% { opacity: 0; transform: translateX(-50%) translateY(5px) scale(0.7); }
-  60% { transform: translateX(-50%) translateY(-8px) scale(1.05); }
-  100% { opacity: 1; transform: translateX(-50%) translateY(-5px) scale(1); }
-}
+    .sparkle:nth-child(5) {
+      top: 15%;
+      left: 20%;
+    }
 
-/* ===== LABUBU STATES ===== */
-.labubu.idle .labubu-body { animation: idleBounce 2s ease-in-out infinite; }
-.labubu.idle .labubu-ear.left { animation: earWiggle 3s ease-in-out infinite; }
-.labubu.idle .labubu-ear.right { animation: earWiggle 3s ease-in-out infinite 0.2s; }
+    .sparkle:nth-child(6) {
+      top: 30%;
+      left: 70%;
+      animation-delay: 0.5s;
+    }
 
-.labubu.wave .labubu-arm.right { animation: wave 0.5s ease-in-out 4; }
-.labubu.wave .labubu-body { animation: idleBounce 1.5s ease-in-out infinite; }
+    .sparkle:nth-child(7) {
+      top: 50%;
+      left: 40%;
+      animation-delay: 1s;
+    }
 
-.labubu.happy { animation: happyDance 0.4s ease-in-out 4; }
-.labubu.happy .labubu-eye { height: 5px; top: 30px; border-radius: 5px 5px 0 0; }
-.labubu.happy .labubu-blush { width: 22px; height: 14px; background: rgba(255, 120, 120, 0.6); }
-.labubu.happy .labubu-mouth { width: 40px; height: 22px; }
-.labubu.happy .labubu-arm.left { animation: armCheer 0.3s ease-in-out infinite alternate; }
-.labubu.happy .labubu-arm.right { animation: armCheer 0.3s ease-in-out infinite alternate-reverse; }
-.labubu.happy .labubu-foot.left { animation: footTap 0.2s ease-in-out infinite alternate; }
-.labubu.happy .labubu-foot.right { animation: footTap 0.2s ease-in-out infinite alternate-reverse; }
+    .sparkle:nth-child(8) {
+      top: 70%;
+      left: 80%;
+      animation-delay: 1.5s;
+    }
 
-.labubu.excited { animation: excitedJump 0.3s ease-in-out 5; }
-.labubu.excited .labubu-eye { width: 24px; height: 26px; }
-.labubu.excited .labubu-eye::before { width: 10px; height: 10px; }
-.labubu.excited .labubu-mouth { width: 30px; height: 25px; }
-.labubu.excited .labubu-mouth-shape { border-radius: 50%; }
-.labubu.excited .labubu-blush { width: 24px; height: 14px; background: rgba(255, 100, 100, 0.7); }
-.labubu.excited .labubu-ear.left { animation: earWiggle 0.3s ease-in-out infinite; }
-.labubu.excited .labubu-ear.right { animation: earWiggle 0.3s ease-in-out infinite 0.1s; }
-.labubu.excited .labubu-arm.left { animation: armCheer 0.2s ease-in-out infinite alternate; transform: rotate(-45deg); }
-.labubu.excited .labubu-arm.right { animation: armCheer 0.2s ease-in-out infinite alternate-reverse; transform: rotate(45deg); }
+    .sparkle:nth-child(9) {
+      top: 85%;
+      left: 15%;
+      animation-delay: 0.3s;
+    }
 
-.labubu.sad .labubu-mouth-shape { border-radius: 20px 20px 0 0; height: 10px; }
-.labubu.sad .labubu-eye::before { top: auto; bottom: 2px; width: 6px; height: 6px; }
-.labubu.sad .labubu-body { animation: sadSway 1.5s ease-in-out infinite; }
-.labubu.sad .labubu-ear.left { transform: rotate(-30deg); }
-.labubu.sad .labubu-ear.right { transform: rotate(30deg); }
+    .sparkle:nth-child(10) {
+      top: 40%;
+      left: 90%;
+      animation-delay: 0.8s;
+    }
 
-.labubu.thinking .labubu-eye.left { animation: blink 2s ease-in-out infinite; }
-.labubu.thinking .labubu-body { animation: thinkTilt 2s ease-in-out infinite; }
-.labubu.thinking .labubu-arm.right { transform: rotate(-50deg) translateY(-5px); }
+    .sparkle:nth-child(11) {
+      top: 20%;
+      left: 55%;
+      animation-delay: 1.2s;
+    }
 
-/* Hat for milestones */
-.labubu-hat {
-  position: absolute; top: -30px; left: 50%;
-  transform: translateX(-50%); z-index: 10; display: none;
-}
-.labubu-hat.show { display: block; animation: hatBounce 0.6s ease-out; }
-.party-hat {
-  width: 0; height: 0;
-  border-left: 25px solid transparent; border-right: 25px solid transparent;
-  border-bottom: 45px solid var(--coral); position: relative;
-  animation: hatWiggle 1s ease-in-out infinite;
-}
-.party-hat::before {
-  content: ''; position: absolute; width: 60px; height: 10px;
-  background: var(--yellow); border-radius: 5px; bottom: -47px; left: -30px;
-}
-.party-hat::after { content: '✨'; position: absolute; top: -15px; left: -5px; font-size: 14px; }
+    @keyframes twinkle {
 
-@keyframes idleBounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-5px); }
-}
-@keyframes earWiggle {
-  0%, 100% { transform: rotate(-20deg); }
-  50% { transform: rotate(-15deg) scaleY(1.05); }
-}
-@keyframes wave {
-  0%, 100% { transform: rotate(-15deg); }
-  50% { transform: rotate(-70deg); }
-}
-@keyframes happyDance {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-18px) rotate(-8deg); }
-  75% { transform: translateY(-18px) rotate(8deg); }
-}
-@keyframes excitedJump {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-25px) scale(1.05); }
-}
-@keyframes armCheer {
-  from { transform: rotate(-50deg); }
-  to { transform: rotate(-70deg); }
-}
-@keyframes footTap {
-  from { transform: translateY(0); }
-  to { transform: translateY(-3px); }
-}
-@keyframes sadSway {
-  0%, 100% { transform: translateX(-50%) translateY(0) rotate(0deg); }
-  25% { transform: translateX(-50%) translateY(2px) rotate(-2deg); }
-  75% { transform: translateX(-50%) translateY(2px) rotate(2deg); }
-}
-@keyframes blink {
-  0%, 45%, 55%, 100% { height: 22px; }
-  50% { height: 2px; }
-}
-@keyframes thinkTilt {
-  0%, 100% { transform: translateX(-50%) rotate(0deg); }
-  50% { transform: translateX(-50%) rotate(5deg); }
-}
-@keyframes hatBounce {
-  0% { transform: translateX(-50%) scale(0) rotate(-30deg); }
-  50% { transform: translateX(-50%) scale(1.3) rotate(10deg); }
-  70% { transform: translateX(-50%) scale(0.9) rotate(-5deg); }
-  100% { transform: translateX(-50%) scale(1) rotate(0deg); }
-}
-@keyframes hatWiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(3deg); }
-  75% { transform: rotate(-3deg); }
-}
-@keyframes popIn {
-  0% { transform: translateX(-50%) scale(0); }
-  70% { transform: translateX(-50%) scale(1.2); }
-  100% { transform: translateX(-50%) scale(1); }
-}
+      0%,
+      100% {
+        opacity: 0.3;
+        transform: scale(0.5) rotate(0deg);
+      }
 
-/* ===== WELCOME SCREEN ===== */
-.welcome-title {
-  font-size: clamp(2rem, 6vw, 3.5rem);
-  font-family: 'Bubblegum Sans', cursive;
-  background: linear-gradient(135deg, var(--coral), var(--purple), var(--sky), var(--mint));
-  background-size: 200% 200%;
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  text-align: center; margin: 15px 0; line-height: 1.2;
-  animation: rainbowTitle 4s ease-in-out infinite, titleBounce 3s ease-in-out infinite;
-}
-@keyframes rainbowTitle {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-@keyframes titleBounce {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  25% { transform: scale(1.02) rotate(-0.5deg); }
-  50% { transform: scale(1.04) rotate(0deg); }
-  75% { transform: scale(1.02) rotate(0.5deg); }
-}
+      50% {
+        opacity: 1;
+        transform: scale(1.4) rotate(180deg);
+      }
+    }
 
-.welcome-subtitle { font-size: 1.2rem; color: #8A8AAA; margin-bottom: 20px; }
+    /* Floating stars in background */
+    .bg-star {
+      position: absolute;
+      font-size: 20px;
+      opacity: 0.15;
+      animation: floatStar linear infinite;
+    }
 
-.name-input-wrap { margin: 10px 0 20px; }
-.name-input-wrap input {
-  font-family: 'Bubblegum Sans', cursive; font-size: 1.2rem;
-  padding: 12px 24px; border: 3px solid var(--lavender);
-  border-radius: 25px; background: rgba(255,255,255,0.8);
-  text-align: center; width: 250px; outline: none;
-  transition: all 0.3s; color: #4A4A6A;
-}
-.name-input-wrap input:focus {
-  border-color: var(--coral);
-  box-shadow: 0 0 20px rgba(255, 118, 117, 0.3);
-  transform: scale(1.02);
-}
-.name-input-wrap input::placeholder { color: #C0C0D0; }
+    @keyframes floatStar {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
 
-/* ===== BUTTONS ===== */
-.btn {
-  font-family: 'Bubblegum Sans', cursive; font-size: 1.4rem;
-  padding: 14px 40px; border: none; border-radius: 30px;
-  cursor: pointer; transition: all 0.2s;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15); position: relative; overflow: hidden;
-}
-.btn::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(rgba(255,255,255,0.3), transparent);
-  border-radius: inherit; pointer-events: none;
-}
-.btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
-.btn:active { transform: translateY(1px) scale(0.98); }
+      10% {
+        opacity: 0.2;
+      }
 
-.btn-primary {
-  background: linear-gradient(135deg, var(--coral), #FF9A9E);
-  color: white; font-size: 1.6rem;
-  animation: btnPulse 2s ease-in-out infinite;
-}
-@keyframes btnPulse {
-  0%, 100% { box-shadow: 0 4px 15px rgba(255, 118, 117, 0.3); }
-  50% { box-shadow: 0 4px 30px rgba(255, 118, 117, 0.6); }
-}
+      90% {
+        opacity: 0.2;
+      }
 
-/* ===== OPERATION SELECT ===== */
-.select-title {
-  font-size: clamp(1.5rem, 4vw, 2.2rem); color: #6A5ACD;
-  margin: 10px 0 25px;
-}
+      100% {
+        transform: translateY(-20vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
 
-.ops-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 15px; max-width: 400px; width: 100%; padding: 0 10px;
-}
+    /* ===== SCREENS ===== */
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
 
-.op-btn {
-  font-family: 'Bubblegum Sans', cursive; font-size: 1.1rem;
-  padding: 20px 10px; border: 3px solid transparent; border-radius: 20px;
-  cursor: pointer; transition: all 0.3s;
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; overflow: hidden;
-}
-.op-btn::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(rgba(255,255,255,0.2), transparent);
-  border-radius: inherit; pointer-events: none;
-}
-.op-btn:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
-.op-btn:active { transform: translateY(0) scale(0.97); }
-.op-btn .op-icon {
-  font-size: 2.2rem;
-  transition: transform 0.3s;
-}
-.op-btn:hover .op-icon { transform: scale(1.3) rotate(10deg); }
+    .screen.active {
+      display: flex;
+      animation: screenIn 0.4s ease-out;
+    }
 
-.op-btn.add { background: linear-gradient(135deg, #FFE0E6, #FFB6C1); color: #C44569; }
-.op-btn.sub { background: linear-gradient(135deg, #E0E6FF, #B6C1FF); color: #4A69C4; }
-.op-btn.mul { background: linear-gradient(135deg, #E6FFE0, #B6FFB1); color: #45A045; }
-.op-btn.div { background: linear-gradient(135deg, #FFF5E0, #FFE4A1); color: #C49A45; }
+    @keyframes screenIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.95) translateY(15px);
+      }
 
-.mix-btn {
-  grid-column: 1 / -1;
-  background: linear-gradient(135deg, var(--pink), var(--purple), var(--sky), var(--mint));
-  background-size: 300% 300%;
-  color: white; font-size: 1.3rem; border: none;
-  animation: mixRainbow 3s ease-in-out infinite;
-}
-@keyframes mixRainbow {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
 
-/* ===== GAME SCREEN ===== */
-.game-header {
-  display: flex; justify-content: space-between; align-items: center;
-  width: 100%; max-width: 500px; padding: 10px 0;
-}
-.score-display, .streak-display {
-  font-size: 1.3rem; display: flex; align-items: center; gap: 5px;
-  transition: transform 0.3s;
-}
-.score-display.pop { animation: scorePop 0.4s ease; }
-.streak-display.fire { animation: firePop 0.5s ease; }
-@keyframes scorePop {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.4); }
-}
-@keyframes firePop {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  25% { transform: scale(1.5) rotate(-5deg); }
-  75% { transform: scale(1.3) rotate(5deg); }
-}
+    /* ===== LABUBU CHARACTER ===== */
+    .labubu {
+      position: relative;
+      width: 160px;
+      height: 180px;
+      margin: 10px auto;
+    }
 
-.level-badge {
-  background: linear-gradient(135deg, var(--yellow), #FFA502);
-  color: white; padding: 5px 15px; border-radius: 15px; font-size: 1rem;
-  transition: all 0.3s;
-}
-.level-badge.levelup { animation: badgePop 0.6s ease; }
-@keyframes badgePop {
-  0% { transform: scale(1); }
-  30% { transform: scale(1.4) rotate(-5deg); }
-  60% { transform: scale(1.1) rotate(3deg); }
-  100% { transform: scale(1) rotate(0deg); }
-}
+    .labubu-body {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 130px;
+      background: var(--labubu-body);
+      border-radius: 55px 55px 45px 45px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), inset 0 -5px 15px rgba(0, 0, 0, 0.05);
+    }
 
-.progress-bar-wrap {
-  width: 100%; max-width: 500px; height: 14px;
-  background: rgba(255,255,255,0.5); border-radius: 10px;
-  margin: 8px 0; overflow: hidden;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
-}
-.progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--mint), var(--sky), var(--purple));
-  background-size: 200% 100%;
-  border-radius: 10px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: progressShimmer 2s linear infinite;
-  position: relative;
-}
-.progress-bar-fill::after {
-  content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 30px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5));
-  border-radius: 0 10px 10px 0;
-}
-@keyframes progressShimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: 0% 0; }
-}
+    .labubu-ear {
+      position: absolute;
+      width: 30px;
+      height: 55px;
+      background: var(--labubu-ear);
+      border-radius: 50% 50% 30% 30%;
+      top: -10px;
+      z-index: 2;
+    }
 
-.problem-display {
-  font-size: clamp(2.5rem, 8vw, 4rem); font-family: 'Nunito', sans-serif;
-  font-weight: 900; color: #4A4A6A; margin: 15px 0; min-height: 70px;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-}
-.problem-display.new { animation: problemSlide 0.4s ease-out; }
-@keyframes problemSlide {
-  0% { opacity: 0; transform: translateX(30px) scale(0.9); }
-  60% { transform: translateX(-5px) scale(1.02); }
-  100% { opacity: 1; transform: translateX(0) scale(1); }
-}
-.problem-display .op-symbol { color: var(--coral); }
+    .labubu-ear.left {
+      left: 10px;
+      transform: rotate(-20deg);
+    }
 
-.answer-display {
-  font-size: 2.5rem; font-family: 'Nunito', sans-serif; font-weight: 900;
-  min-height: 55px; min-width: 120px; padding: 5px 20px;
-  background: rgba(255,255,255,0.7); border: 3px dashed var(--lavender);
-  border-radius: 15px; display: flex; align-items: center; justify-content: center;
-  color: #6A5ACD; margin-bottom: 10px; transition: all 0.2s;
-}
-.answer-display.typing {
-  border-color: var(--sky);
-  box-shadow: 0 0 15px rgba(116, 185, 255, 0.3);
-}
-.answer-display.correct {
-  border-color: var(--mint); border-style: solid;
-  background: rgba(152, 216, 200, 0.3);
-  animation: correctPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 0 25px rgba(152, 216, 200, 0.5);
-}
-.answer-display.wrong {
-  border-color: var(--coral); border-style: solid;
-  background: rgba(255, 118, 117, 0.15);
-  animation: shake 0.5s ease;
-}
-@keyframes correctPop {
-  0% { transform: scale(1); }
-  40% { transform: scale(1.15); }
-  100% { transform: scale(1); }
-}
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  15% { transform: translateX(-10px) rotate(-2deg); }
-  30% { transform: translateX(10px) rotate(2deg); }
-  45% { transform: translateX(-8px) rotate(-1deg); }
-  60% { transform: translateX(8px) rotate(1deg); }
-  75% { transform: translateX(-4px); }
-}
+    .labubu-ear.right {
+      right: 10px;
+      transform: rotate(20deg);
+    }
 
-/* Number pad */
-.numpad {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 8px; max-width: 300px; width: 100%; padding: 5px;
-}
-.numpad-btn {
-  font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.6rem;
-  padding: 14px; border: none; border-radius: 15px;
-  background: rgba(255,255,255,0.85); color: #4A4A6A;
-  cursor: pointer; transition: all 0.15s;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-  -webkit-tap-highlight-color: transparent;
-  position: relative; overflow: hidden;
-}
-.numpad-btn::after {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, transparent 70%);
-  opacity: 0; transition: opacity 0.2s; pointer-events: none;
-}
-.numpad-btn:active::after { opacity: 1; }
-.numpad-btn:hover { background: white; transform: translateY(-2px) scale(1.05); box-shadow: 0 6px 15px rgba(0,0,0,0.12); }
-.numpad-btn:active { transform: translateY(1px) scale(0.95); }
-.numpad-btn.pressed { animation: btnBounce 0.2s ease; }
-@keyframes btnBounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(0.9); }
-}
+    .labubu-ear::after {
+      content: '';
+      position: absolute;
+      width: 60%;
+      height: 70%;
+      background: #FFD1DC;
+      border-radius: inherit;
+      top: 15%;
+      left: 20%;
+    }
 
-.numpad-btn.submit-btn {
-  background: linear-gradient(135deg, var(--mint), #7BCBBA);
-  color: white; font-family: 'Bubblegum Sans', cursive; font-size: 1.3rem;
-}
-.numpad-btn.submit-btn:hover { background: linear-gradient(135deg, #7BCBBA, #5FB8A5); }
-.numpad-btn.clear-btn {
-  background: linear-gradient(135deg, var(--pink), #FFAAB5);
-  color: white; font-family: 'Bubblegum Sans', cursive; font-size: 1.2rem;
-}
+    .labubu-face {
+      position: absolute;
+      width: 90px;
+      height: 80px;
+      background: var(--labubu-face);
+      border-radius: 50%;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      box-shadow: inset 0 -3px 8px rgba(0, 0, 0, 0.04);
+    }
 
-/* Feedback */
-.feedback {
-  font-size: 1.5rem; min-height: 40px; margin: 8px 0;
-  opacity: 0; transition: opacity 0.3s; text-align: center;
-}
-.feedback.show { opacity: 1; animation: feedbackPop 0.4s ease-out; }
-@keyframes feedbackPop {
-  0% { opacity: 0; transform: translateY(10px) scale(0.8); }
-  60% { transform: translateY(-3px) scale(1.05); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-.feedback.correct-msg { color: #2ECC71; }
-.feedback.wrong-msg { color: var(--coral); }
+    .labubu-eye {
+      position: absolute;
+      width: 20px;
+      height: 22px;
+      background: #2D2D2D;
+      border-radius: 50%;
+      top: 22px;
+      z-index: 4;
+      transition: all 0.3s ease;
+    }
 
-.quit-btn {
-  position: absolute; top: 15px; left: 15px;
-  font-family: 'Bubblegum Sans', cursive; font-size: 1rem;
-  padding: 8px 16px; border: 2px solid var(--lavender);
-  border-radius: 20px; background: rgba(255,255,255,0.7);
-  color: #8A8AAA; cursor: pointer; z-index: 5;
-}
-.quit-btn:hover { background: white; }
+    .labubu-eye.left {
+      left: 20px;
+    }
 
-.voice-toggle {
-  position: absolute; top: 15px; right: 15px;
-  font-family: 'Bubblegum Sans', cursive; font-size: 1.3rem;
-  padding: 8px 14px; border: 2px solid var(--lavender);
-  border-radius: 20px; background: rgba(255,255,255,0.7);
-  cursor: pointer; z-index: 5; transition: all 0.2s;
-}
-.voice-toggle:hover { background: white; }
-.voice-toggle.off { opacity: 0.5; }
+    .labubu-eye.right {
+      right: 20px;
+    }
 
-/* ===== EMOJI BURST ===== */
-.emoji-burst {
-  position: fixed; pointer-events: none; z-index: 100;
-  font-size: 1.8rem; animation: emojiFly 1.2s ease-out forwards;
-}
-@keyframes emojiFly {
-  0% { opacity: 1; transform: translateY(0) scale(0.5) rotate(0deg); }
-  30% { opacity: 1; transform: translateY(-40px) scale(1.3) rotate(20deg); }
-  100% { opacity: 0; transform: translateY(-120px) scale(0.3) rotate(45deg); }
-}
+    .labubu-eye::before {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: all 0.3s;
+    }
 
-/* ===== STAR COLLECT ANIMATION ===== */
-.star-collect {
-  position: fixed; pointer-events: none; z-index: 101;
-  font-size: 2rem; animation: starCollect 0.8s ease-in forwards;
-}
-@keyframes starCollect {
-  0% { opacity: 1; transform: scale(1.5); }
-  100% { opacity: 0; transform: scale(0.3) translateY(-60px); }
-}
+    .labubu-eye::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: white;
+      border-radius: 50%;
+      bottom: 5px;
+      right: 3px;
+    }
 
-/* ===== SUMMARY SCREEN ===== */
-.summary-card {
-  background: rgba(255,255,255,0.9); border-radius: 30px; padding: 30px;
-  max-width: 400px; width: 90%; text-align: center;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-  animation: cardReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-@keyframes cardReveal {
-  0% { opacity: 0; transform: translateY(40px) scale(0.8); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-.summary-title {
-  font-size: 2rem; color: #6A5ACD; margin-bottom: 10px;
-}
-.summary-stats { display: flex; justify-content: space-around; margin: 20px 0; }
-.stat { display: flex; flex-direction: column; align-items: center; }
-.stat-value {
-  font-size: 2.2rem; font-family: 'Nunito', sans-serif; font-weight: 900;
-}
-.stat-label { font-size: 0.95rem; color: #8A8AAA; }
-.stat.stars .stat-value { color: #FFA502; animation: countUp 1s ease-out; }
-.stat.accuracy .stat-value { color: #2ECC71; animation: countUp 1s ease-out 0.2s both; }
-.stat.best .stat-value { color: var(--coral); animation: countUp 1s ease-out 0.4s both; }
-@keyframes countUp {
-  0% { opacity: 0; transform: translateY(15px) scale(0.5); }
-  60% { transform: translateY(-5px) scale(1.1); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-.summary-message { font-size: 1.2rem; color: #6A5ACD; margin: 15px 0; }
-.summary-btns {
-  display: flex; gap: 12px; justify-content: center;
-  flex-wrap: wrap; margin-top: 15px;
-}
+    .labubu-mouth {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 35px;
+      height: 18px;
+      z-index: 4;
+      transition: all 0.3s;
+    }
 
-/* ===== CONFETTI ===== */
-.confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
-.confetti-piece {
-  position: absolute; width: 10px; height: 10px; top: -10px;
-  animation: confettiFall linear forwards;
-}
-@keyframes confettiFall {
-  0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 1; }
-  25% { transform: translateY(25vh) rotate(180deg) translateX(20px); }
-  50% { transform: translateY(50vh) rotate(360deg) translateX(-15px); }
-  75% { transform: translateY(75vh) rotate(540deg) translateX(10px); }
-  100% { transform: translateY(105vh) rotate(720deg) translateX(-5px); opacity: 0; }
-}
+    .labubu-mouth-shape {
+      width: 100%;
+      height: 100%;
+      background: #FF6B81;
+      border-radius: 0 0 20px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
 
-/* ===== LEVEL UP OVERLAY ===== */
-.level-up-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.3);
-  display: none; align-items: center; justify-content: center; z-index: 50;
-}
-.level-up-overlay.show { display: flex; animation: overlayIn 0.3s ease; }
-@keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
-.level-up-box {
-  background: white; border-radius: 30px; padding: 40px; text-align: center;
-  animation: levelBoxIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-}
-@keyframes levelBoxIn {
-  0% { opacity: 0; transform: scale(0.3) rotate(-10deg); }
-  60% { transform: scale(1.1) rotate(3deg); }
-  100% { opacity: 1; transform: scale(1) rotate(0deg); }
-}
-.level-up-box h2 {
-  font-size: 2.5rem;
-  background: linear-gradient(135deg, var(--yellow), var(--coral), var(--purple));
-  background-size: 200% 200%;
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  animation: rainbowTitle 2s ease-in-out infinite;
-}
-.level-up-box p { font-size: 1.2rem; color: #8A8AAA; margin-top: 10px; }
-.level-up-emoji { font-size: 3rem; animation: emojiSpin 1s ease-in-out infinite; margin-bottom: 10px; }
-@keyframes emojiSpin {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  25% { transform: scale(1.2) rotate(-10deg); }
-  75% { transform: scale(1.2) rotate(10deg); }
-}
+    .labubu-teeth {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 2px;
+    }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 480px) {
-  .labubu { transform: scale(0.8); margin: 0 auto; }
-  .numpad { max-width: 260px; }
-  .numpad-btn { padding: 12px; font-size: 1.4rem; }
-  .ops-grid { max-width: 320px; }
-  .summary-card { padding: 20px; }
-}
-@media (min-height: 800px) {
-  .labubu { transform: scale(1.1); }
-}
-</style>
+    .tooth {
+      width: 7px;
+      height: 8px;
+      background: white;
+      border-radius: 0 0 3px 3px;
+    }
+
+    .labubu-blush {
+      position: absolute;
+      width: 18px;
+      height: 10px;
+      background: rgba(255, 150, 150, 0.5);
+      border-radius: 50%;
+      top: 42px;
+      z-index: 4;
+      transition: all 0.3s;
+    }
+
+    .labubu-blush.left {
+      left: 6px;
+    }
+
+    .labubu-blush.right {
+      right: 6px;
+    }
+
+    .labubu-arm {
+      position: absolute;
+      width: 25px;
+      height: 50px;
+      background: var(--labubu-body);
+      border-radius: 15px;
+      top: 55px;
+      z-index: 1;
+      transition: transform 0.3s;
+    }
+
+    .labubu-arm.left {
+      left: -8px;
+      transform: rotate(15deg);
+      transform-origin: top center;
+    }
+
+    .labubu-arm.right {
+      right: -8px;
+      transform: rotate(-15deg);
+      transform-origin: top center;
+    }
+
+    .labubu-foot {
+      position: absolute;
+      width: 30px;
+      height: 18px;
+      background: var(--labubu-body);
+      border-radius: 50%;
+      bottom: -5px;
+      z-index: 1;
+    }
+
+    .labubu-foot.left {
+      left: 18px;
+    }
+
+    .labubu-foot.right {
+      right: 18px;
+    }
+
+    /* Speech bubble */
+    .speech-bubble {
+      position: absolute;
+      top: -55px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border-radius: 18px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      z-index: 20;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .speech-bubble.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-5px);
+      animation: bubblePop 0.3s ease-out;
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 10px solid white;
+    }
+
+    @keyframes bubblePop {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(5px) scale(0.7);
+      }
+
+      60% {
+        transform: translateX(-50%) translateY(-8px) scale(1.05);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-5px) scale(1);
+      }
+    }
+
+    /* ===== LABUBU STATES ===== */
+    .labubu.idle .labubu-body {
+      animation: idleBounce 2s ease-in-out infinite;
+    }
+
+    .labubu.idle .labubu-ear.left {
+      animation: earWiggle 3s ease-in-out infinite;
+    }
+
+    .labubu.idle .labubu-ear.right {
+      animation: earWiggle 3s ease-in-out infinite 0.2s;
+    }
+
+    .labubu.wave .labubu-arm.right {
+      animation: wave 0.5s ease-in-out 4;
+    }
+
+    .labubu.wave .labubu-body {
+      animation: idleBounce 1.5s ease-in-out infinite;
+    }
+
+    .labubu.happy {
+      animation: happyDance 0.4s ease-in-out 4;
+    }
+
+    .labubu.happy .labubu-eye {
+      height: 5px;
+      top: 30px;
+      border-radius: 5px 5px 0 0;
+    }
+
+    .labubu.happy .labubu-blush {
+      width: 22px;
+      height: 14px;
+      background: rgba(255, 120, 120, 0.6);
+    }
+
+    .labubu.happy .labubu-mouth {
+      width: 40px;
+      height: 22px;
+    }
+
+    .labubu.happy .labubu-arm.left {
+      animation: armCheer 0.3s ease-in-out infinite alternate;
+    }
+
+    .labubu.happy .labubu-arm.right {
+      animation: armCheer 0.3s ease-in-out infinite alternate-reverse;
+    }
+
+    .labubu.happy .labubu-foot.left {
+      animation: footTap 0.2s ease-in-out infinite alternate;
+    }
+
+    .labubu.happy .labubu-foot.right {
+      animation: footTap 0.2s ease-in-out infinite alternate-reverse;
+    }
+
+    .labubu.excited {
+      animation: excitedJump 0.3s ease-in-out 5;
+    }
+
+    .labubu.excited .labubu-eye {
+      width: 24px;
+      height: 26px;
+    }
+
+    .labubu.excited .labubu-eye::before {
+      width: 10px;
+      height: 10px;
+    }
+
+    .labubu.excited .labubu-mouth {
+      width: 30px;
+      height: 25px;
+    }
+
+    .labubu.excited .labubu-mouth-shape {
+      border-radius: 50%;
+    }
+
+    .labubu.excited .labubu-blush {
+      width: 24px;
+      height: 14px;
+      background: rgba(255, 100, 100, 0.7);
+    }
+
+    .labubu.excited .labubu-ear.left {
+      animation: earWiggle 0.3s ease-in-out infinite;
+    }
+
+    .labubu.excited .labubu-ear.right {
+      animation: earWiggle 0.3s ease-in-out infinite 0.1s;
+    }
+
+    .labubu.excited .labubu-arm.left {
+      animation: armCheer 0.2s ease-in-out infinite alternate;
+      transform: rotate(-45deg);
+    }
+
+    .labubu.excited .labubu-arm.right {
+      animation: armCheer 0.2s ease-in-out infinite alternate-reverse;
+      transform: rotate(45deg);
+    }
+
+    .labubu.sad .labubu-mouth-shape {
+      border-radius: 20px 20px 0 0;
+      height: 10px;
+    }
+
+    .labubu.sad .labubu-eye::before {
+      top: auto;
+      bottom: 2px;
+      width: 6px;
+      height: 6px;
+    }
+
+    .labubu.sad .labubu-body {
+      animation: sadSway 1.5s ease-in-out infinite;
+    }
+
+    .labubu.sad .labubu-ear.left {
+      transform: rotate(-30deg);
+    }
+
+    .labubu.sad .labubu-ear.right {
+      transform: rotate(30deg);
+    }
+
+    .labubu.thinking .labubu-eye.left {
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    .labubu.thinking .labubu-body {
+      animation: thinkTilt 2s ease-in-out infinite;
+    }
+
+    .labubu.thinking .labubu-arm.right {
+      transform: rotate(-50deg) translateY(-5px);
+    }
+
+    /* Hat for milestones */
+    .labubu-hat {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: none;
+    }
+
+    .labubu-hat.show {
+      display: block;
+      animation: hatBounce 0.6s ease-out;
+    }
+
+    .party-hat {
+      width: 0;
+      height: 0;
+      border-left: 25px solid transparent;
+      border-right: 25px solid transparent;
+      border-bottom: 45px solid var(--coral);
+      position: relative;
+      animation: hatWiggle 1s ease-in-out infinite;
+    }
+
+    .party-hat::before {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 10px;
+      background: var(--yellow);
+      border-radius: 5px;
+      bottom: -47px;
+      left: -30px;
+    }
+
+    .party-hat::after {
+      content: '✨';
+      position: absolute;
+      top: -15px;
+      left: -5px;
+      font-size: 14px;
+    }
+
+    @keyframes idleBounce {
+
+      0%,
+      100% {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      50% {
+        transform: translateX(-50%) translateY(-5px);
+      }
+    }
+
+    @keyframes earWiggle {
+
+      0%,
+      100% {
+        transform: rotate(-20deg);
+      }
+
+      50% {
+        transform: rotate(-15deg) scaleY(1.05);
+      }
+    }
+
+    @keyframes wave {
+
+      0%,
+      100% {
+        transform: rotate(-15deg);
+      }
+
+      50% {
+        transform: rotate(-70deg);
+      }
+    }
+
+    @keyframes happyDance {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      25% {
+        transform: translateY(-18px) rotate(-8deg);
+      }
+
+      75% {
+        transform: translateY(-18px) rotate(8deg);
+      }
+    }
+
+    @keyframes excitedJump {
+
+      0%,
+      100% {
+        transform: translateY(0) scale(1);
+      }
+
+      50% {
+        transform: translateY(-25px) scale(1.05);
+      }
+    }
+
+    @keyframes armCheer {
+      from {
+        transform: rotate(-50deg);
+      }
+
+      to {
+        transform: rotate(-70deg);
+      }
+    }
+
+    @keyframes footTap {
+      from {
+        transform: translateY(0);
+      }
+
+      to {
+        transform: translateY(-3px);
+      }
+    }
+
+    @keyframes sadSway {
+
+      0%,
+      100% {
+        transform: translateX(-50%) translateY(0) rotate(0deg);
+      }
+
+      25% {
+        transform: translateX(-50%) translateY(2px) rotate(-2deg);
+      }
+
+      75% {
+        transform: translateX(-50%) translateY(2px) rotate(2deg);
+      }
+    }
+
+    @keyframes blink {
+
+      0%,
+      45%,
+      55%,
+      100% {
+        height: 22px;
+      }
+
+      50% {
+        height: 2px;
+      }
+    }
+
+    @keyframes thinkTilt {
+
+      0%,
+      100% {
+        transform: translateX(-50%) rotate(0deg);
+      }
+
+      50% {
+        transform: translateX(-50%) rotate(5deg);
+      }
+    }
+
+    @keyframes hatBounce {
+      0% {
+        transform: translateX(-50%) scale(0) rotate(-30deg);
+      }
+
+      50% {
+        transform: translateX(-50%) scale(1.3) rotate(10deg);
+      }
+
+      70% {
+        transform: translateX(-50%) scale(0.9) rotate(-5deg);
+      }
+
+      100% {
+        transform: translateX(-50%) scale(1) rotate(0deg);
+      }
+    }
+
+    @keyframes hatWiggle {
+
+      0%,
+      100% {
+        transform: rotate(0deg);
+      }
+
+      25% {
+        transform: rotate(3deg);
+      }
+
+      75% {
+        transform: rotate(-3deg);
+      }
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: translateX(-50%) scale(0);
+      }
+
+      70% {
+        transform: translateX(-50%) scale(1.2);
+      }
+
+      100% {
+        transform: translateX(-50%) scale(1);
+      }
+    }
+
+    /* ===== WELCOME SCREEN ===== */
+    .welcome-title {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-family: 'Bubblegum Sans', cursive;
+      background: linear-gradient(135deg, var(--coral), var(--purple), var(--sky), var(--mint));
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      margin: 15px 0;
+      line-height: 1.2;
+      animation: rainbowTitle 4s ease-in-out infinite, titleBounce 3s ease-in-out infinite;
+    }
+
+    @keyframes rainbowTitle {
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    @keyframes titleBounce {
+
+      0%,
+      100% {
+        transform: scale(1) rotate(0deg);
+      }
+
+      25% {
+        transform: scale(1.02) rotate(-0.5deg);
+      }
+
+      50% {
+        transform: scale(1.04) rotate(0deg);
+      }
+
+      75% {
+        transform: scale(1.02) rotate(0.5deg);
+      }
+    }
+
+    .welcome-subtitle {
+      font-size: 1.2rem;
+      color: #8A8AAA;
+      margin-bottom: 20px;
+    }
+
+    .name-input-wrap {
+      margin: 10px 0 20px;
+    }
+
+    .name-input-wrap input {
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.2rem;
+      padding: 12px 24px;
+      border: 3px solid var(--lavender);
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.8);
+      text-align: center;
+      width: 250px;
+      outline: none;
+      transition: all 0.3s;
+      color: #4A4A6A;
+    }
+
+    .name-input-wrap input:focus {
+      border-color: var(--coral);
+      box-shadow: 0 0 20px rgba(255, 118, 117, 0.3);
+      transform: scale(1.02);
+    }
+
+    .name-input-wrap input::placeholder {
+      color: #C0C0D0;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.4rem;
+      padding: 14px 40px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(255, 255, 255, 0.3), transparent);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--coral), #FF9A9E);
+      color: white;
+      font-size: 1.6rem;
+      animation: btnPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes btnPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 4px 15px rgba(255, 118, 117, 0.3);
+      }
+
+      50% {
+        box-shadow: 0 4px 30px rgba(255, 118, 117, 0.6);
+      }
+    }
+
+    /* ===== OPERATION SELECT ===== */
+    .select-title {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      color: #6A5ACD;
+      margin: 10px 0 25px;
+    }
+
+    .ops-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      max-width: 400px;
+      width: 100%;
+      padding: 0 10px;
+    }
+
+    .op-btn {
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.1rem;
+      padding: 20px 10px;
+      border: 3px solid transparent;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .op-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(255, 255, 255, 0.2), transparent);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .op-btn:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .op-btn:active {
+      transform: translateY(0) scale(0.97);
+    }
+
+    .op-btn .op-icon {
+      font-size: 2.2rem;
+      transition: transform 0.3s;
+    }
+
+    .op-btn:hover .op-icon {
+      transform: scale(1.3) rotate(10deg);
+    }
+
+    .op-btn.add {
+      background: linear-gradient(135deg, #FFE0E6, #FFB6C1);
+      color: #C44569;
+    }
+
+    .op-btn.sub {
+      background: linear-gradient(135deg, #E0E6FF, #B6C1FF);
+      color: #4A69C4;
+    }
+
+    .op-btn.mul {
+      background: linear-gradient(135deg, #E6FFE0, #B6FFB1);
+      color: #45A045;
+    }
+
+    .op-btn.div {
+      background: linear-gradient(135deg, #FFF5E0, #FFE4A1);
+      color: #C49A45;
+    }
+
+    .mix-btn {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, var(--pink), var(--purple), var(--sky), var(--mint));
+      background-size: 300% 300%;
+      color: white;
+      font-size: 1.3rem;
+      border: none;
+      animation: mixRainbow 3s ease-in-out infinite;
+    }
+
+    @keyframes mixRainbow {
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    /* ===== GAME SCREEN ===== */
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 500px;
+      padding: 10px 0;
+    }
+
+    .score-display,
+    .streak-display {
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: transform 0.3s;
+    }
+
+    .score-display.pop {
+      animation: scorePop 0.4s ease;
+    }
+
+    .streak-display.fire {
+      animation: firePop 0.5s ease;
+    }
+
+    @keyframes scorePop {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.4);
+      }
+    }
+
+    @keyframes firePop {
+
+      0%,
+      100% {
+        transform: scale(1) rotate(0deg);
+      }
+
+      25% {
+        transform: scale(1.5) rotate(-5deg);
+      }
+
+      75% {
+        transform: scale(1.3) rotate(5deg);
+      }
+    }
+
+    .level-badge {
+      background: linear-gradient(135deg, var(--yellow), #FFA502);
+      color: white;
+      padding: 5px 15px;
+      border-radius: 15px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .level-badge.levelup {
+      animation: badgePop 0.6s ease;
+    }
+
+    @keyframes badgePop {
+      0% {
+        transform: scale(1);
+      }
+
+      30% {
+        transform: scale(1.4) rotate(-5deg);
+      }
+
+      60% {
+        transform: scale(1.1) rotate(3deg);
+      }
+
+      100% {
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      max-width: 500px;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 10px;
+      margin: 8px 0;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--mint), var(--sky), var(--purple));
+      background-size: 200% 100%;
+      border-radius: 10px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: progressShimmer 2s linear infinite;
+      position: relative;
+    }
+
+    .progress-bar-fill::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 30px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5));
+      border-radius: 0 10px 10px 0;
+    }
+
+    @keyframes progressShimmer {
+      0% {
+        background-position: 200% 0;
+      }
+
+      100% {
+        background-position: 0% 0;
+      }
+    }
+
+    .problem-display {
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      color: #4A4A6A;
+      margin: 15px 0;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .problem-display.new {
+      animation: problemSlide 0.4s ease-out;
+    }
+
+    @keyframes problemSlide {
+      0% {
+        opacity: 0;
+        transform: translateX(30px) scale(0.9);
+      }
+
+      60% {
+        transform: translateX(-5px) scale(1.02);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    .problem-display .op-symbol {
+      color: var(--coral);
+    }
+
+    .answer-display {
+      font-size: 2.5rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      min-height: 55px;
+      min-width: 120px;
+      padding: 5px 20px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 3px dashed var(--lavender);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6A5ACD;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+
+    .answer-display.typing {
+      border-color: var(--sky);
+      box-shadow: 0 0 15px rgba(116, 185, 255, 0.3);
+    }
+
+    .answer-display.correct {
+      border-color: var(--mint);
+      border-style: solid;
+      background: rgba(152, 216, 200, 0.3);
+      animation: correctPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 0 25px rgba(152, 216, 200, 0.5);
+    }
+
+    .answer-display.wrong {
+      border-color: var(--coral);
+      border-style: solid;
+      background: rgba(255, 118, 117, 0.15);
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes correctPop {
+      0% {
+        transform: scale(1);
+      }
+
+      40% {
+        transform: scale(1.15);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      15% {
+        transform: translateX(-10px) rotate(-2deg);
+      }
+
+      30% {
+        transform: translateX(10px) rotate(2deg);
+      }
+
+      45% {
+        transform: translateX(-8px) rotate(-1deg);
+      }
+
+      60% {
+        transform: translateX(8px) rotate(1deg);
+      }
+
+      75% {
+        transform: translateX(-4px);
+      }
+    }
+
+    /* Number pad */
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      max-width: 300px;
+      width: 100%;
+      padding: 5px;
+    }
+
+    .numpad-btn {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      padding: 14px;
+      border: none;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.85);
+      color: #4A4A6A;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .numpad-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+
+    .numpad-btn:active::after {
+      opacity: 1;
+    }
+
+    .numpad-btn:hover {
+      background: white;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+    }
+
+    .numpad-btn:active {
+      transform: translateY(1px) scale(0.95);
+    }
+
+    .numpad-btn.pressed {
+      animation: btnBounce 0.2s ease;
+    }
+
+    @keyframes btnBounce {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(0.9);
+      }
+    }
+
+    .numpad-btn.submit-btn {
+      background: linear-gradient(135deg, var(--mint), #7BCBBA);
+      color: white;
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.3rem;
+    }
+
+    .numpad-btn.submit-btn:hover {
+      background: linear-gradient(135deg, #7BCBBA, #5FB8A5);
+    }
+
+    .numpad-btn.clear-btn {
+      background: linear-gradient(135deg, var(--pink), #FFAAB5);
+      color: white;
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.2rem;
+    }
+
+    /* Feedback */
+    .feedback {
+      font-size: 1.5rem;
+      min-height: 40px;
+      margin: 8px 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+      text-align: center;
+    }
+
+    .feedback.show {
+      opacity: 1;
+      animation: feedbackPop 0.4s ease-out;
+    }
+
+    @keyframes feedbackPop {
+      0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.8);
+      }
+
+      60% {
+        transform: translateY(-3px) scale(1.05);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .feedback.correct-msg {
+      color: #2ECC71;
+    }
+
+    .feedback.wrong-msg {
+      color: var(--coral);
+    }
+
+    .quit-btn {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1rem;
+      padding: 8px 16px;
+      border: 2px solid var(--lavender);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.7);
+      color: #8A8AAA;
+      cursor: pointer;
+      z-index: 5;
+    }
+
+    .quit-btn:hover {
+      background: white;
+    }
+
+    .voice-toggle {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.3rem;
+      padding: 8px 14px;
+      border: 2px solid var(--lavender);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      z-index: 5;
+      transition: all 0.2s;
+    }
+
+    .voice-toggle:hover {
+      background: white;
+    }
+
+    .voice-toggle.off {
+      opacity: 0.5;
+    }
+
+    /* ===== EMOJI BURST ===== */
+    .emoji-burst {
+      position: fixed;
+      pointer-events: none;
+      z-index: 100;
+      font-size: 1.8rem;
+      animation: emojiFly 1.2s ease-out forwards;
+    }
+
+    @keyframes emojiFly {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(0.5) rotate(0deg);
+      }
+
+      30% {
+        opacity: 1;
+        transform: translateY(-40px) scale(1.3) rotate(20deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(-120px) scale(0.3) rotate(45deg);
+      }
+    }
+
+    /* ===== STAR COLLECT ANIMATION ===== */
+    .star-collect {
+      position: fixed;
+      pointer-events: none;
+      z-index: 101;
+      font-size: 2rem;
+      animation: starCollect 0.8s ease-in forwards;
+    }
+
+    @keyframes starCollect {
+      0% {
+        opacity: 1;
+        transform: scale(1.5);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(0.3) translateY(-60px);
+      }
+    }
+
+    /* ===== SUMMARY SCREEN ===== */
+    .summary-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 30px;
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      animation: cardReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes cardReveal {
+      0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.8);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .summary-title {
+      font-size: 2rem;
+      color: #6A5ACD;
+      margin-bottom: 10px;
+    }
+
+    .summary-stats {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-value {
+      font-size: 2.2rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+    }
+
+    .stat-label {
+      font-size: 0.95rem;
+      color: #8A8AAA;
+    }
+
+    .stat.stars .stat-value {
+      color: #FFA502;
+      animation: countUp 1s ease-out;
+    }
+
+    .stat.accuracy .stat-value {
+      color: #2ECC71;
+      animation: countUp 1s ease-out 0.2s both;
+    }
+
+    .stat.best .stat-value {
+      color: var(--coral);
+      animation: countUp 1s ease-out 0.4s both;
+    }
+
+    @keyframes countUp {
+      0% {
+        opacity: 0;
+        transform: translateY(15px) scale(0.5);
+      }
+
+      60% {
+        transform: translateY(-5px) scale(1.1);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .summary-message {
+      font-size: 1.2rem;
+      color: #6A5ACD;
+      margin: 15px 0;
+    }
+
+    .summary-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    /* ===== CONFETTI ===== */
+    .confetti-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      top: -10px;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(0) rotate(0deg) translateX(0);
+        opacity: 1;
+      }
+
+      25% {
+        transform: translateY(25vh) rotate(180deg) translateX(20px);
+      }
+
+      50% {
+        transform: translateY(50vh) rotate(360deg) translateX(-15px);
+      }
+
+      75% {
+        transform: translateY(75vh) rotate(540deg) translateX(10px);
+      }
+
+      100% {
+        transform: translateY(105vh) rotate(720deg) translateX(-5px);
+        opacity: 0;
+      }
+    }
+
+    /* ===== LEVEL UP OVERLAY ===== */
+    .level-up-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .level-up-overlay.show {
+      display: flex;
+      animation: overlayIn 0.3s ease;
+    }
+
+    @keyframes overlayIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .level-up-box {
+      background: white;
+      border-radius: 30px;
+      padding: 40px;
+      text-align: center;
+      animation: levelBoxIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes levelBoxIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3) rotate(-10deg);
+      }
+
+      60% {
+        transform: scale(1.1) rotate(3deg);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    .level-up-box h2 {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--yellow), var(--coral), var(--purple));
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: rainbowTitle 2s ease-in-out infinite;
+    }
+
+    .level-up-box p {
+      font-size: 1.2rem;
+      color: #8A8AAA;
+      margin-top: 10px;
+    }
+
+    .level-up-emoji {
+      font-size: 3rem;
+      animation: emojiSpin 1s ease-in-out infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes emojiSpin {
+
+      0%,
+      100% {
+        transform: scale(1) rotate(0deg);
+      }
+
+      25% {
+        transform: scale(1.2) rotate(-10deg);
+      }
+
+      75% {
+        transform: scale(1.2) rotate(10deg);
+      }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 480px) {
+      .labubu {
+        transform: scale(0.8);
+        margin: 0 auto;
+      }
+
+      .numpad {
+        max-width: 260px;
+      }
+
+      .numpad-btn {
+        padding: 12px;
+        font-size: 1.4rem;
+      }
+
+      .ops-grid {
+        max-width: 320px;
+      }
+
+      .summary-card {
+        padding: 20px;
+      }
+    }
+
+    @media (min-height: 800px) {
+      .labubu {
+        transform: scale(1.1);
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="bg-elements">
-  <div class="cloud"></div><div class="cloud"></div><div class="cloud"></div><div class="cloud"></div>
-  <div class="sparkle"></div><div class="sparkle"></div><div class="sparkle"></div>
-  <div class="sparkle"></div><div class="sparkle"></div><div class="sparkle"></div><div class="sparkle"></div>
-</div>
-
-<div class="confetti-container" id="confettiContainer"></div>
-
-<div class="level-up-overlay" id="levelUpOverlay">
-  <div class="level-up-box">
-    <div class="level-up-emoji" id="levelUpEmoji">🏆</div>
-    <h2>Level Up!</h2>
-    <p id="levelUpMsg">You're amazing!</p>
+  <div class="bg-elements">
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
+    <div class="sparkle"></div>
   </div>
-</div>
 
-<!-- ==================== WELCOME ==================== -->
-<div class="screen active" id="welcomeScreen">
-  <div class="labubu idle wave" id="welcomeLabubu">
-    <div class="speech-bubble" id="welcomeBubble">Hi there! Let's do math!</div>
-    <div class="labubu-body">
-      <div class="labubu-ear left"></div><div class="labubu-ear right"></div>
-      <div class="labubu-face">
-        <div class="labubu-eye left"></div><div class="labubu-eye right"></div>
-        <div class="labubu-blush left"></div><div class="labubu-blush right"></div>
-        <div class="labubu-mouth"><div class="labubu-mouth-shape"><div class="labubu-teeth"><div class="tooth"></div><div class="tooth"></div><div class="tooth"></div></div></div></div>
+  <div class="confetti-container" id="confettiContainer"></div>
+
+  <div class="level-up-overlay" id="levelUpOverlay">
+    <div class="level-up-box">
+      <div class="level-up-emoji" id="levelUpEmoji">🏆</div>
+      <h2>Level Up!</h2>
+      <p id="levelUpMsg">You're amazing!</p>
+    </div>
+  </div>
+
+  <!-- ==================== WELCOME ==================== -->
+  <div class="screen active" id="welcomeScreen">
+    <div class="labubu idle wave" id="welcomeLabubu">
+      <div class="speech-bubble" id="welcomeBubble">Hi there! Let's do math!</div>
+      <div class="labubu-body">
+        <div class="labubu-ear left"></div>
+        <div class="labubu-ear right"></div>
+        <div class="labubu-face">
+          <div class="labubu-eye left"></div>
+          <div class="labubu-eye right"></div>
+          <div class="labubu-blush left"></div>
+          <div class="labubu-blush right"></div>
+          <div class="labubu-mouth">
+            <div class="labubu-mouth-shape">
+              <div class="labubu-teeth">
+                <div class="tooth"></div>
+                <div class="tooth"></div>
+                <div class="tooth"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="labubu-arm left"></div>
+        <div class="labubu-arm right"></div>
+        <div class="labubu-foot left"></div>
+        <div class="labubu-foot right"></div>
       </div>
-      <div class="labubu-arm left"></div><div class="labubu-arm right"></div>
-      <div class="labubu-foot left"></div><div class="labubu-foot right"></div>
     </div>
+    <h1 class="welcome-title">Labubu Math<br>Adventure!</h1>
+    <p class="welcome-subtitle">Learn math with your friend Labubu!</p>
+    <div class="name-input-wrap">
+      <input type="text" id="playerName" placeholder="Your name..." maxlength="15" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" onclick="goToSelect()">Let's Play!</button>
   </div>
-  <h1 class="welcome-title">Labubu Math<br>Adventure!</h1>
-  <p class="welcome-subtitle">Learn math with your friend Labubu!</p>
-  <div class="name-input-wrap">
-    <input type="text" id="playerName" placeholder="Your name..." maxlength="15" autocomplete="off">
-  </div>
-  <button class="btn btn-primary" onclick="goToSelect()">Let's Play!</button>
-</div>
 
-<!-- ==================== SELECT ==================== -->
-<div class="screen" id="selectScreen">
-  <div class="labubu idle" id="selectLabubu">
-    <div class="speech-bubble" id="selectBubble">Pick one!</div>
-    <div class="labubu-body">
-      <div class="labubu-ear left"></div><div class="labubu-ear right"></div>
-      <div class="labubu-face">
-        <div class="labubu-eye left"></div><div class="labubu-eye right"></div>
-        <div class="labubu-blush left"></div><div class="labubu-blush right"></div>
-        <div class="labubu-mouth"><div class="labubu-mouth-shape"><div class="labubu-teeth"><div class="tooth"></div><div class="tooth"></div><div class="tooth"></div></div></div></div>
+  <!-- ==================== SELECT ==================== -->
+  <div class="screen" id="selectScreen">
+    <div class="labubu idle" id="selectLabubu">
+      <div class="speech-bubble" id="selectBubble">Pick one!</div>
+      <div class="labubu-body">
+        <div class="labubu-ear left"></div>
+        <div class="labubu-ear right"></div>
+        <div class="labubu-face">
+          <div class="labubu-eye left"></div>
+          <div class="labubu-eye right"></div>
+          <div class="labubu-blush left"></div>
+          <div class="labubu-blush right"></div>
+          <div class="labubu-mouth">
+            <div class="labubu-mouth-shape">
+              <div class="labubu-teeth">
+                <div class="tooth"></div>
+                <div class="tooth"></div>
+                <div class="tooth"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="labubu-arm left"></div>
+        <div class="labubu-arm right"></div>
+        <div class="labubu-foot left"></div>
+        <div class="labubu-foot right"></div>
       </div>
-      <div class="labubu-arm left"></div><div class="labubu-arm right"></div>
-      <div class="labubu-foot left"></div><div class="labubu-foot right"></div>
+    </div>
+    <h2 class="select-title" id="selectTitle">Pick a challenge!</h2>
+    <div class="ops-grid">
+      <button class="op-btn add" onclick="startGame('add')"><span class="op-icon">➕</span>Addition</button>
+      <button class="op-btn sub" onclick="startGame('sub')"><span class="op-icon">➖</span>Subtraction</button>
+      <button class="op-btn mul" onclick="startGame('mul')"><span class="op-icon">✖️</span>Multiplication</button>
+      <button class="op-btn div" onclick="startGame('div')"><span class="op-icon">➗</span>Division</button>
+      <button class="op-btn mix-btn" onclick="startGame('mix')"><span class="op-icon">🎲</span>Mix It Up!</button>
+      <button class="op-btn words-btn" onclick="startGame('words')"><span class="op-icon">📚</span>Site Words</button>
     </div>
   </div>
-  <h2 class="select-title" id="selectTitle">Pick a challenge!</h2>
-  <div class="ops-grid">
-    <button class="op-btn add" onclick="startGame('add')"><span class="op-icon">➕</span>Addition</button>
-    <button class="op-btn sub" onclick="startGame('sub')"><span class="op-icon">➖</span>Subtraction</button>
-    <button class="op-btn mul" onclick="startGame('mul')"><span class="op-icon">✖️</span>Multiplication</button>
-    <button class="op-btn div" onclick="startGame('div')"><span class="op-icon">➗</span>Division</button>
-    <button class="op-btn mix-btn" onclick="startGame('mix')"><span class="op-icon">🎲</span>Mix It Up!</button>
-  </div>
-</div>
 
-<!-- ==================== GAME ==================== -->
-<div class="screen" id="gameScreen">
-  <button class="quit-btn" onclick="quitGame()">← Back</button>
-  <button class="voice-toggle" id="voiceToggle" onclick="toggleVoice()">🔊</button>
+  <style>
+    /* New styles for Word Game */
+    .words-btn {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #FF9A9E, #FECFEF);
+      color: #D980FA;
+      font-size: 1.3rem;
+      border: none;
+    }
 
-  <div class="game-header">
-    <div class="score-display" id="scoreDisplay">⭐ <span id="scoreVal">0</span></div>
-    <div class="level-badge" id="levelBadge">Level 1</div>
-    <div class="streak-display" id="streakDisplay">🔥 <span id="streakVal">0</span></div>
-  </div>
+    .word-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      width: 100%;
+      max-width: 480px;
+      padding: 10px;
+      display: none;
+      /* Hidden by default */
+    }
 
-  <div class="progress-bar-wrap">
-    <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
-  </div>
+    .word-btn {
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.8rem;
+      padding: 20px 10px;
+      border: none;
+      border-radius: 20px;
+      background: white;
+      color: #4A4A6A;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
 
-  <div class="labubu idle" id="gameLabubu">
-    <div class="speech-bubble" id="gameBubble"></div>
-    <div class="labubu-hat" id="labubuHat"><div class="party-hat"></div></div>
-    <div class="labubu-body">
-      <div class="labubu-ear left"></div><div class="labubu-ear right"></div>
-      <div class="labubu-face">
-        <div class="labubu-eye left"></div><div class="labubu-eye right"></div>
-        <div class="labubu-blush left"></div><div class="labubu-blush right"></div>
-        <div class="labubu-mouth"><div class="labubu-mouth-shape"><div class="labubu-teeth"><div class="tooth"></div><div class="tooth"></div><div class="tooth"></div></div></div></div>
+    .word-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .word-btn:active {
+      transform: translateY(1px);
+    }
+
+    .word-btn.correct {
+      background: #69F0AE;
+      color: white;
+      animation: correctPop 0.4s ease;
+    }
+
+    .word-btn.wrong {
+      background: #FF5252;
+      color: white;
+      animation: shake 0.4s ease;
+    }
+
+    /* Adjust game screen for words */
+    .screen.word-mode .numpad,
+    .screen.word-mode .problem-display,
+    .screen.word-mode .answer-display {
+      display: none;
+    }
+
+    .screen.word-mode .word-options {
+      display: grid;
+    }
+
+    .screen.word-mode .labubu {
+      margin-bottom: 20px;
+    }
+  </style>
+
+  <!-- ==================== GAME ==================== -->
+  <div class="screen" id="gameScreen">
+    <button class="quit-btn" onclick="quitGame()">← Back</button>
+    <button class="voice-toggle" id="voiceToggle" onclick="toggleVoice()">🔊</button>
+
+    <div class="game-header">
+      <div class="score-display" id="scoreDisplay">⭐ <span id="scoreVal">0</span></div>
+      <div class="level-badge" id="levelBadge">Level 1</div>
+      <div class="streak-display" id="streakDisplay">🔥 <span id="streakVal">0</span></div>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <div class="labubu idle" id="gameLabubu">
+      <div class="speech-bubble" id="gameBubble"></div>
+      <div class="labubu-hat" id="labubuHat">
+        <div class="party-hat"></div>
       </div>
-      <div class="labubu-arm left"></div><div class="labubu-arm right"></div>
-      <div class="labubu-foot left"></div><div class="labubu-foot right"></div>
-    </div>
-  </div>
-
-  <div class="problem-display" id="problemDisplay">...</div>
-  <div class="answer-display" id="answerDisplay">&nbsp;</div>
-  <div class="feedback" id="feedback">&nbsp;</div>
-
-  <div class="numpad">
-    <button class="numpad-btn" onclick="numPress(1)">1</button>
-    <button class="numpad-btn" onclick="numPress(2)">2</button>
-    <button class="numpad-btn" onclick="numPress(3)">3</button>
-    <button class="numpad-btn" onclick="numPress(4)">4</button>
-    <button class="numpad-btn" onclick="numPress(5)">5</button>
-    <button class="numpad-btn" onclick="numPress(6)">6</button>
-    <button class="numpad-btn" onclick="numPress(7)">7</button>
-    <button class="numpad-btn" onclick="numPress(8)">8</button>
-    <button class="numpad-btn" onclick="numPress(9)">9</button>
-    <button class="numpad-btn clear-btn" onclick="clearAnswer()">Clear</button>
-    <button class="numpad-btn zero-btn" onclick="numPress(0)">0</button>
-    <button class="numpad-btn submit-btn" onclick="submitAnswer()">Go!</button>
-  </div>
-</div>
-
-<!-- ==================== SUMMARY ==================== -->
-<div class="screen" id="summaryScreen">
-  <div class="labubu happy" id="summaryLabubu">
-    <div class="speech-bubble" id="summaryBubble">You did it!</div>
-    <div class="labubu-hat show" id="summaryHat"><div class="party-hat"></div></div>
-    <div class="labubu-body">
-      <div class="labubu-ear left"></div><div class="labubu-ear right"></div>
-      <div class="labubu-face">
-        <div class="labubu-eye left"></div><div class="labubu-eye right"></div>
-        <div class="labubu-blush left"></div><div class="labubu-blush right"></div>
-        <div class="labubu-mouth"><div class="labubu-mouth-shape"><div class="labubu-teeth"><div class="tooth"></div><div class="tooth"></div><div class="tooth"></div></div></div></div>
+      <div class="labubu-body">
+        <div class="labubu-ear left"></div>
+        <div class="labubu-ear right"></div>
+        <div class="labubu-face">
+          <div class="labubu-eye left"></div>
+          <div class="labubu-eye right"></div>
+          <div class="labubu-blush left"></div>
+          <div class="labubu-blush right"></div>
+          <div class="labubu-mouth">
+            <div class="labubu-mouth-shape">
+              <div class="labubu-teeth">
+                <div class="tooth"></div>
+                <div class="tooth"></div>
+                <div class="tooth"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="labubu-arm left"></div>
+        <div class="labubu-arm right"></div>
+        <div class="labubu-foot left"></div>
+        <div class="labubu-foot right"></div>
       </div>
-      <div class="labubu-arm left"></div><div class="labubu-arm right"></div>
-      <div class="labubu-foot left"></div><div class="labubu-foot right"></div>
+    </div>
+
+    <div class="problem-display" id="problemDisplay">...</div>
+    <div class="answer-display" id="answerDisplay">&nbsp;</div>
+    <div class="feedback" id="feedback">&nbsp;</div>
+
+    <div class="numpad">
+      <button class="numpad-btn" onclick="numPress(1)">1</button>
+      <button class="numpad-btn" onclick="numPress(2)">2</button>
+      <button class="numpad-btn" onclick="numPress(3)">3</button>
+      <button class="numpad-btn" onclick="numPress(4)">4</button>
+      <button class="numpad-btn" onclick="numPress(5)">5</button>
+      <button class="numpad-btn" onclick="numPress(6)">6</button>
+      <button class="numpad-btn" onclick="numPress(7)">7</button>
+      <button class="numpad-btn" onclick="numPress(8)">8</button>
+      <button class="numpad-btn" onclick="numPress(9)">9</button>
+      <button class="numpad-btn clear-btn" onclick="clearAnswer()">Clear</button>
+      <button class="numpad-btn zero-btn" onclick="numPress(0)">0</button>
+      <button class="numpad-btn submit-btn" onclick="submitAnswer()">Go!</button>
+    </div>
+    <div class="word-options" id="wordOptions"></div>
+  </div>
+
+  <!-- ==================== SUMMARY ==================== -->
+  <div class="screen" id="summaryScreen">
+    <div class="labubu happy" id="summaryLabubu">
+      <div class="speech-bubble" id="summaryBubble">You did it!</div>
+      <div class="labubu-hat show" id="summaryHat">
+        <div class="party-hat"></div>
+      </div>
+      <div class="labubu-body">
+        <div class="labubu-ear left"></div>
+        <div class="labubu-ear right"></div>
+        <div class="labubu-face">
+          <div class="labubu-eye left"></div>
+          <div class="labubu-eye right"></div>
+          <div class="labubu-blush left"></div>
+          <div class="labubu-blush right"></div>
+          <div class="labubu-mouth">
+            <div class="labubu-mouth-shape">
+              <div class="labubu-teeth">
+                <div class="tooth"></div>
+                <div class="tooth"></div>
+                <div class="tooth"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="labubu-arm left"></div>
+        <div class="labubu-arm right"></div>
+        <div class="labubu-foot left"></div>
+        <div class="labubu-foot right"></div>
+      </div>
+    </div>
+    <div class="summary-card">
+      <h2 class="summary-title">Great Job!</h2>
+      <p class="summary-message" id="summaryMsg">You're a math superstar!</p>
+      <div class="summary-stats">
+        <div class="stat stars">
+          <div class="stat-value" id="sumStars">0</div>
+          <div class="stat-label">Stars ⭐</div>
+        </div>
+        <div class="stat accuracy">
+          <div class="stat-value" id="sumAccuracy">0%</div>
+          <div class="stat-label">Accuracy</div>
+        </div>
+        <div class="stat best">
+          <div class="stat-value" id="sumStreak">0</div>
+          <div class="stat-label">Best Streak 🔥</div>
+        </div>
+      </div>
+      <div class="summary-btns">
+        <button class="btn btn-primary" onclick="goToSelect()">Play Again!</button>
+        <button class="btn" style="background: var(--lavender); color: white;" onclick="goToWelcome()">Home</button>
+      </div>
     </div>
   </div>
-  <div class="summary-card">
-    <h2 class="summary-title">Great Job!</h2>
-    <p class="summary-message" id="summaryMsg">You're a math superstar!</p>
-    <div class="summary-stats">
-      <div class="stat stars"><div class="stat-value" id="sumStars">0</div><div class="stat-label">Stars ⭐</div></div>
-      <div class="stat accuracy"><div class="stat-value" id="sumAccuracy">0%</div><div class="stat-label">Accuracy</div></div>
-      <div class="stat best"><div class="stat-value" id="sumStreak">0</div><div class="stat-label">Best Streak 🔥</div></div>
-    </div>
-    <div class="summary-btns">
-      <button class="btn btn-primary" onclick="goToSelect()">Play Again!</button>
-      <button class="btn" style="background: var(--lavender); color: white;" onclick="goToWelcome()">Home</button>
-    </div>
-  </div>
-</div>
 
-<script>
-// ===== AUDIO =====
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let audioCtx;
-function ensureAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
+  <script>
+    // ===== AUDIO =====
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+    function ensureAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
 
-function playTone(freq, duration, type = 'sine', volume = 0.15) {
-  ensureAudio();
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = type;
-  osc.frequency.value = freq;
-  gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-  osc.connect(gain); gain.connect(audioCtx.destination);
-  osc.start(); osc.stop(audioCtx.currentTime + duration);
-}
+    function playTone(freq, duration, type = 'sine', volume = 0.15) {
+      ensureAudio();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + duration);
+    }
 
-function playChord(freqs, duration, type = 'sine', volume = 0.08) {
-  freqs.forEach(f => playTone(f, duration, type, volume));
-}
+    function playChord(freqs, duration, type = 'sine', volume = 0.08) {
+      freqs.forEach(f => playTone(f, duration, type, volume));
+    }
 
-function playCorrectSound() {
-  playChord([523, 659, 784], 0.1, 'sine', 0.06);
-  setTimeout(() => playChord([659, 784, 1047], 0.25, 'sine', 0.08), 120);
-}
+    function playCorrectSound() {
+      playChord([523, 659, 784], 0.1, 'sine', 0.06);
+      setTimeout(() => playChord([659, 784, 1047], 0.25, 'sine', 0.08), 120);
+    }
 
-function playWrongSound() {
-  playTone(330, 0.25, 'triangle', 0.08);
-  setTimeout(() => playTone(311, 0.3, 'triangle', 0.08), 130);
-}
+    function playWrongSound() {
+      playTone(330, 0.25, 'triangle', 0.08);
+      setTimeout(() => playTone(311, 0.3, 'triangle', 0.08), 130);
+    }
 
-function playClickSound() {
-  playTone(660 + Math.random() * 200, 0.04, 'sine', 0.04);
-}
+    function playClickSound() {
+      playTone(660 + Math.random() * 200, 0.04, 'sine', 0.04);
+    }
 
-function playLevelUpSound() {
-  const notes = [523, 587, 659, 698, 784, 880, 988, 1047];
-  notes.forEach((f, i) => setTimeout(() => {
-    playTone(f, 0.15, 'sine', 0.1);
-    if (i > 4) playTone(f * 0.5, 0.15, 'sine', 0.05); // bass harmony
-  }, i * 80));
-}
+    function playLevelUpSound() {
+      const notes = [523, 587, 659, 698, 784, 880, 988, 1047];
+      notes.forEach((f, i) => setTimeout(() => {
+        playTone(f, 0.15, 'sine', 0.1);
+        if (i > 4) playTone(f * 0.5, 0.15, 'sine', 0.05); // bass harmony
+      }, i * 80));
+    }
 
-function playStreakSound() {
-  const notes = [523, 659, 784, 1047];
-  notes.forEach((f, i) => setTimeout(() => playChord([f, f * 1.25], 0.12, 'sine', 0.08), i * 60));
-}
+    function playStreakSound() {
+      const notes = [523, 659, 784, 1047];
+      notes.forEach((f, i) => setTimeout(() => playChord([f, f * 1.25], 0.12, 'sine', 0.08), i * 60));
+    }
 
-function playMilestoneSound() {
-  const fanfare = [784, 784, 784, 1047];
-  const durations = [0.08, 0.08, 0.08, 0.4];
-  let t = 0;
-  fanfare.forEach((f, i) => {
-    setTimeout(() => {
-      playTone(f, durations[i], 'sine', 0.12);
-      playTone(f * 0.5, durations[i], 'sine', 0.06);
-    }, t);
-    t += durations[i] * 500;
-  });
-}
+    function playMilestoneSound() {
+      const fanfare = [784, 784, 784, 1047];
+      const durations = [0.08, 0.08, 0.08, 0.4];
+      let t = 0;
+      fanfare.forEach((f, i) => {
+        setTimeout(() => {
+          playTone(f, durations[i], 'sine', 0.12);
+          playTone(f * 0.5, durations[i], 'sine', 0.06);
+        }, t);
+        t += durations[i] * 500;
+      });
+    }
 
-function playEncouragementSound() {
-  playChord([349, 440, 523], 0.3, 'sine', 0.06);
-  setTimeout(() => playChord([392, 494, 587], 0.4, 'sine', 0.07), 200);
-}
+    function playEncouragementSound() {
+      playChord([349, 440, 523], 0.3, 'sine', 0.06);
+      setTimeout(() => playChord([392, 494, 587], 0.4, 'sine', 0.07), 200);
+    }
 
-function playComboBreaker() {
-  const freqs = [262, 330, 392, 523, 659, 784, 1047, 1319];
-  freqs.forEach((f, i) => setTimeout(() => {
-    playTone(f, 0.1, 'square', 0.04);
-    playTone(f * 2, 0.06, 'sine', 0.03);
-  }, i * 45));
-}
+    function playComboBreaker() {
+      const freqs = [262, 330, 392, 523, 659, 784, 1047, 1319];
+      freqs.forEach((f, i) => setTimeout(() => {
+        playTone(f, 0.1, 'square', 0.04);
+        playTone(f * 2, 0.06, 'sine', 0.03);
+      }, i * 45));
+    }
 
-function playGameStartSound() {
-  const melody = [523, 659, 784, 1047, 784, 1047];
-  melody.forEach((f, i) => setTimeout(() => playTone(f, 0.12, 'sine', 0.1), i * 100));
-}
+    function playGameStartSound() {
+      const melody = [523, 659, 784, 1047, 784, 1047];
+      melody.forEach((f, i) => setTimeout(() => playTone(f, 0.12, 'sine', 0.1), i * 100));
+    }
 
-function playSummarySound() {
-  const melody = [523, 659, 784, 659, 784, 1047, 1319];
-  melody.forEach((f, i) => setTimeout(() => {
-    playTone(f, 0.2, 'sine', 0.08);
-    if (i >= 4) playTone(f * 0.5, 0.2, 'sine', 0.04);
-  }, i * 150));
-}
+    function playSummarySound() {
+      const melody = [523, 659, 784, 659, 784, 1047, 1319];
+      melody.forEach((f, i) => setTimeout(() => {
+        playTone(f, 0.2, 'sine', 0.08);
+        if (i >= 4) playTone(f * 0.5, 0.2, 'sine', 0.04);
+      }, i * 150));
+    }
 
-// ===== VOICE =====
-const voiceLines = {
-  correct: [
-    "Amazing!", "Great job!", "You got it!", "Wonderful!",
-    "That's right!", "Yay!", "Perfect!", "Super smart!",
-    "You're awesome!", "Fantastic!", "Way to go!", "Brilliant!",
-    "Math whiz!", "Genius!", "So cool!"
-  ],
-  wrong: [
-    "Oops! Let's try the next one!", "Don't worry, you'll get it!",
-    "Almost there! Keep going!", "That's okay, you're learning!",
-    "Nice try! Let's keep going!", "No worries! Next one!",
-    "So close! You can do it!", "Good effort! Try the next one!"
-  ],
-  streak3: [
-    "Three in a row! You're on fire!",
-    "Hat trick! Amazing!",
-    "Triple combo! Keep it up!",
-    "Three stars! Woo hoo!"
-  ],
-  streak5: [
-    "Five in a row! Unstoppable!",
-    "Mega streak! You're a math wizard!",
-    "High five! Five correct!",
-    "Superstar mode activated!"
-  ],
-  streak10: [
-    "Ten in a row! Incredible!",
-    "Legendary streak! You're a superstar!",
-    "Ten combo! Nothing can stop you!",
-    "Math champion! Ten in a row!"
-  ],
-  milestone5: [
-    "Five stars! Labubu is so proud!",
-    "Five stars earned! You're glowing!",
-    "Wow, five stars! Keep shining!"
-  ],
-  milestone10: [
-    "Level up! You're a math champion!",
-    "Ten stars! Labubu is doing a happy dance!",
-    "Superstar! Ten stars and counting!"
-  ],
-  gameStart: [
-    "Let's do this!", "Math time! Let's go!",
-    "Ready? Here we go!", "Labubu believes in you!",
-    "You've got this!", "Adventure time!"
-  ],
-  gameEnd90: [
-    "Wow! You're a math superstar! Labubu is so proud!",
-    "Incredible score! You're amazing!",
-    "Absolutely perfect! You're the best!"
-  ],
-  gameEnd70: [
-    "Great job! You did really well!",
-    "Awesome work! Keep practicing!",
-    "Really good! Labubu is happy!"
-  ],
-  gameEnd50: [
-    "Nice effort! You're getting better!",
-    "Good try! Practice makes perfect!",
-    "You're learning fast!"
-  ],
-  gameEndLow: [
-    "Don't give up! Labubu believes in you!",
-    "You're learning! Let's play again!",
-    "Every try makes you stronger!"
-  ],
-  thinking: [
-    "Hmm, take your time!", "Think carefully!",
-    "You can figure it out!", "No rush!"
-  ]
-};
+    // ===== VOICE =====
+    const voiceLines = {
+      correct: [
+        "Amazing!", "Great job!", "You got it!", "Wonderful!",
+        "That's right!", "Yay!", "Perfect!", "Super smart!",
+        "You're awesome!", "Fantastic!", "Way to go!", "Brilliant!",
+        "Math whiz!", "Genius!", "So cool!"
+      ],
+      wrong: [
+        "Oops! Let's try the next one!", "Don't worry, you'll get it!",
+        "Almost there! Keep going!", "That's okay, you're learning!",
+        "Nice try! Let's keep going!", "No worries! Next one!",
+        "So close! You can do it!", "Good effort! Try the next one!"
+      ],
+      streak3: [
+        "Three in a row! You're on fire!",
+        "Hat trick! Amazing!",
+        "Triple combo! Keep it up!",
+        "Three stars! Woo hoo!"
+      ],
+      streak5: [
+        "Five in a row! Unstoppable!",
+        "Mega streak! You're a math wizard!",
+        "High five! Five correct!",
+        "Superstar mode activated!"
+      ],
+      streak10: [
+        "Ten in a row! Incredible!",
+        "Legendary streak! You're a superstar!",
+        "Ten combo! Nothing can stop you!",
+        "Math champion! Ten in a row!"
+      ],
+      milestone5: [
+        "Five stars! Labubu is so proud!",
+        "Five stars earned! You're glowing!",
+        "Wow, five stars! Keep shining!"
+      ],
+      milestone10: [
+        "Level up! You're a math champion!",
+        "Ten stars! Labubu is doing a happy dance!",
+        "Superstar! Ten stars and counting!"
+      ],
+      gameStart: [
+        "Let's do this!", "Math time! Let's go!",
+        "Ready? Here we go!", "Labubu believes in you!",
+        "You've got this!", "Adventure time!"
+      ],
+      gameEnd90: [
+        "Wow! You're a math superstar! Labubu is so proud!",
+        "Incredible score! You're amazing!",
+        "Absolutely perfect! You're the best!"
+      ],
+      gameEnd70: [
+        "Great job! You did really well!",
+        "Awesome work! Keep practicing!",
+        "Really good! Labubu is happy!"
+      ],
+      gameEnd50: [
+        "Nice effort! You're getting better!",
+        "Good try! Practice makes perfect!",
+        "You're learning fast!"
+      ],
+      gameEndLow: [
+        "Don't give up! Labubu believes in you!",
+        "You're learning! Let's play again!",
+        "Every try makes you stronger!"
+      ],
+      thinking: [
+        "Hmm, take your time!", "Think carefully!",
+        "You can figure it out!", "No rush!"
+      ]
+    };
 
-let speechEnabled = true;
-let lastSpoke = 0;
+    let speechEnabled = true;
+    let lastSpoke = 0;
 
-function speak(text, rate = 1.1, pitch = 1.4) {
-  if (!speechEnabled || !window.speechSynthesis) return;
-  const now = Date.now();
-  if (now - lastSpoke < 800) return;
-  lastSpoke = now;
-  window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.rate = rate; utter.pitch = pitch; utter.volume = 0.8;
-  const voices = window.speechSynthesis.getVoices();
-  const preferred = voices.find(v =>
-    v.name.includes('Samantha') || v.name.includes('Karen') ||
-    v.name.includes('Moira') || v.name.includes('Tessa') ||
-    (v.lang.startsWith('en') && v.name.includes('Female'))
-  ) || voices.find(v => v.lang.startsWith('en'));
-  if (preferred) utter.voice = preferred;
-  window.speechSynthesis.speak(utter);
-}
+    function speak(text, rate = 1.1, pitch = 1.4) {
+      if (!speechEnabled || !window.speechSynthesis) return;
+      const now = Date.now();
+      if (now - lastSpoke < 800) return;
+      lastSpoke = now;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = rate; utter.pitch = pitch; utter.volume = 0.8;
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v =>
+        v.name.includes('Samantha') || v.name.includes('Karen') ||
+        v.name.includes('Moira') || v.name.includes('Tessa') ||
+        (v.lang.startsWith('en') && v.name.includes('Female'))
+      ) || voices.find(v => v.lang.startsWith('en'));
+      if (preferred) utter.voice = preferred;
+      window.speechSynthesis.speak(utter);
+    }
 
-function speakRandom(category) {
-  const lines = voiceLines[category];
-  if (lines) speak(lines[randInt(0, lines.length - 1)]);
-}
+    function speakRandom(category) {
+      const lines = voiceLines[category];
+      if (lines) speak(lines[randInt(0, lines.length - 1)]);
+    }
 
-if (window.speechSynthesis) {
-  window.speechSynthesis.getVoices();
-  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-}
+    if (window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
 
-// ===== SPEECH BUBBLE =====
-let bubbleTimer = null;
-function showBubble(id, text, duration = 2500) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = text;
-  el.classList.add('show');
-  clearTimeout(bubbleTimer);
-  bubbleTimer = setTimeout(() => el.classList.remove('show'), duration);
-}
+    // ===== SPEECH BUBBLE =====
+    let bubbleTimer = null;
+    function showBubble(id, text, duration = 2500) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = text;
+      el.classList.add('show');
+      clearTimeout(bubbleTimer);
+      bubbleTimer = setTimeout(() => el.classList.remove('show'), duration);
+    }
 
-// ===== EMOJI BURST =====
-function emojiBurst(emojis, x, y, count = 5) {
-  for (let i = 0; i < count; i++) {
-    const el = document.createElement('div');
-    el.className = 'emoji-burst';
-    el.textContent = emojis[randInt(0, emojis.length - 1)];
-    el.style.left = (x + randInt(-40, 40)) + 'px';
-    el.style.top = (y + randInt(-20, 20)) + 'px';
-    el.style.animationDelay = (i * 0.08) + 's';
-    el.style.animationDuration = (0.8 + Math.random() * 0.5) + 's';
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2000);
-  }
-}
+    // ===== EMOJI BURST =====
+    function emojiBurst(emojis, x, y, count = 5) {
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'emoji-burst';
+        el.textContent = emojis[randInt(0, emojis.length - 1)];
+        el.style.left = (x + randInt(-40, 40)) + 'px';
+        el.style.top = (y + randInt(-20, 20)) + 'px';
+        el.style.animationDelay = (i * 0.08) + 's';
+        el.style.animationDuration = (0.8 + Math.random() * 0.5) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 2000);
+      }
+    }
 
-function starCollectAnim(x, y) {
-  const el = document.createElement('div');
-  el.className = 'star-collect';
-  el.textContent = '⭐';
-  el.style.left = x + 'px'; el.style.top = y + 'px';
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1000);
-}
+    function starCollectAnim(x, y) {
+      const el = document.createElement('div');
+      el.className = 'star-collect';
+      el.textContent = '⭐';
+      el.style.left = x + 'px'; el.style.top = y + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1000);
+    }
 
-// ===== FLOATING BG STARS =====
-function spawnBgStars() {
-  const container = document.querySelector('.bg-elements');
-  const starEmojis = ['⭐', '✨', '💫', '🌟'];
-  for (let i = 0; i < 8; i++) {
-    const star = document.createElement('div');
-    star.className = 'bg-star';
-    star.textContent = starEmojis[randInt(0, starEmojis.length - 1)];
-    star.style.left = randInt(5, 95) + '%';
-    star.style.animationDuration = (12 + Math.random() * 15) + 's';
-    star.style.animationDelay = (Math.random() * 10) + 's';
-    star.style.fontSize = (14 + Math.random() * 14) + 'px';
-    container.appendChild(star);
-  }
-}
-spawnBgStars();
+    // ===== FLOATING BG STARS =====
+    function spawnBgStars() {
+      const container = document.querySelector('.bg-elements');
+      const starEmojis = ['⭐', '✨', '💫', '🌟'];
+      for (let i = 0; i < 8; i++) {
+        const star = document.createElement('div');
+        star.className = 'bg-star';
+        star.textContent = starEmojis[randInt(0, starEmojis.length - 1)];
+        star.style.left = randInt(5, 95) + '%';
+        star.style.animationDuration = (12 + Math.random() * 15) + 's';
+        star.style.animationDelay = (Math.random() * 10) + 's';
+        star.style.fontSize = (14 + Math.random() * 14) + 'px';
+        container.appendChild(star);
+      }
+    }
+    spawnBgStars();
 
-// ===== WELCOME BUBBLE =====
-setTimeout(() => showBubble('welcomeBubble', 'Hi there! Let\'s do math! 🎉', 4000), 800);
+    // ===== WELCOME BUBBLE =====
+    setTimeout(() => showBubble('welcomeBubble', 'Hi there! Let\'s do math! 🎉', 4000), 800);
 
-// ===== GAME STATE =====
-let state = {
-  playerName: '', operation: 'add',
-  score: 0, streak: 0, bestStreak: 0, level: 1,
-  questionsAnswered: 0, questionsCorrect: 0,
-  totalQuestions: 15, currentAnswer: '',
-  correctAnswer: 0, wrongStreak: 0, waiting: false,
-  thinkTimer: null
-};
+    // ===== GAME STATE =====
+    let state = {
+      playerName: '', operation: 'add',
+      score: 0, streak: 0, bestStreak: 0, level: 1,
+      questionsAnswered: 0, questionsCorrect: 0,
+      totalQuestions: 15, currentAnswer: '',
+      correctAnswer: 0, wrongStreak: 0, waiting: false,
+      thinkTimer: null
+    };
 
-// ===== SCREEN NAV =====
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
+    // ===== SCREEN NAV =====
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
 
-function goToWelcome() { showScreen('welcomeScreen'); }
+    function goToWelcome() { showScreen('welcomeScreen'); }
 
-function goToSelect() {
-  state.playerName = document.getElementById('playerName').value.trim() || 'Friend';
-  document.getElementById('selectTitle').textContent =
-    `What do you want to practice, ${state.playerName}?`;
-  showScreen('selectScreen');
-  setTimeout(() => showBubble('selectBubble', `Let's go, ${state.playerName}! 💪`, 3000), 400);
-}
+    function goToSelect() {
+      state.playerName = document.getElementById('playerName').value.trim() || 'Friend';
+      document.getElementById('selectTitle').textContent =
+        `What do you want to practice, ${state.playerName}?`;
+      showScreen('selectScreen');
+      setTimeout(() => showBubble('selectBubble', `Let's go, ${state.playerName}! 💪`, 3000), 400);
+    }
 
-function quitGame() {
-  clearTimeout(state.thinkTimer);
-  if (state.questionsAnswered > 0) showSummary();
-  else showScreen('selectScreen');
-}
+    function quitGame() {
+      clearTimeout(state.thinkTimer);
+      if (state.questionsAnswered > 0) showSummary();
+      else showScreen('selectScreen');
+    }
 
-// ===== UTILS =====
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+    // ===== UTILS =====
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-// ===== PROBLEM GENERATION =====
-function generateProblem() {
-  let op = state.operation;
-  if (op === 'mix') op = ['add', 'sub', 'mul', 'div'][randInt(0, 3)];
+    // ===== PROBLEM GENERATION =====
+    function generateProblem() {
+      let op = state.operation;
+      if (op === 'mix') op = ['add', 'sub', 'mul', 'div'][randInt(0, 3)];
 
-  let a, b, answer, symbol;
-  const hard = state.level >= 2;
+      let a, b, answer, symbol;
+      const hard = state.level >= 2;
 
-  switch (op) {
-    case 'add':
-      a = randInt(1, hard ? 20 : 10); b = randInt(1, hard ? 20 : 10);
-      answer = a + b; symbol = '+'; break;
-    case 'sub':
-      a = randInt(1, hard ? 20 : 10); b = randInt(1, hard ? a : Math.min(a, 10));
-      answer = a - b; symbol = '−'; break;
-    case 'mul':
-      a = randInt(1, hard ? 10 : 5); b = randInt(1, hard ? 10 : 5);
-      answer = a * b; symbol = '×'; break;
-    case 'div':
-      b = randInt(1, hard ? 10 : 5); answer = randInt(1, hard ? 10 : 5);
-      a = b * answer; symbol = '÷'; break;
-  }
+      switch (op) {
+        case 'add':
+          a = randInt(1, hard ? 20 : 10); b = randInt(1, hard ? 20 : 10);
+          answer = a + b; symbol = '+'; break;
+        case 'sub':
+          a = randInt(1, hard ? 20 : 10); b = randInt(1, hard ? a : Math.min(a, 10));
+          answer = a - b; symbol = '−'; break;
+        case 'mul':
+          a = randInt(1, hard ? 10 : 5); b = randInt(1, hard ? 10 : 5);
+          answer = a * b; symbol = '×'; break;
+        case 'div':
+          b = randInt(1, hard ? 10 : 5); answer = randInt(1, hard ? 10 : 5);
+          a = b * answer; symbol = '÷'; break;
+      }
 
-  state.correctAnswer = answer;
-  const display = document.getElementById('problemDisplay');
-  display.innerHTML = `${a} <span class="op-symbol">${symbol}</span> ${b} = ?`;
-  display.classList.remove('new');
-  void display.offsetWidth;
-  display.classList.add('new');
+      state.correctAnswer = answer;
+      const display = document.getElementById('problemDisplay');
+      display.innerHTML = `${a} <span class="op-symbol">${symbol}</span> ${b} = ?`;
+      display.classList.remove('new');
+      void display.offsetWidth;
+      display.classList.add('new');
 
-  // Thinking timer — Labubu encourages if taking too long
-  clearTimeout(state.thinkTimer);
-  state.thinkTimer = setTimeout(() => {
-    if (!state.waiting) {
-      setLabubuState('gameLabubu', 'thinking');
-      const line = voiceLines.thinking[randInt(0, voiceLines.thinking.length - 1)];
-      showBubble('gameBubble', line, 2500);
-      speakRandom('thinking');
+      // Thinking timer — Labubu encourages if taking too long
+      clearTimeout(state.thinkTimer);
+      state.thinkTimer = setTimeout(() => {
+        if (!state.waiting) {
+          setLabubuState('gameLabubu', 'thinking');
+          const line = voiceLines.thinking[randInt(0, voiceLines.thinking.length - 1)];
+          showBubble('gameBubble', line, 2500);
+          speakRandom('thinking');
+          setTimeout(() => {
+            if (!state.waiting) setLabubuState('gameLabubu', 'idle');
+          }, 2500);
+        }
+      }, 8000);
+    }
+
+    // ===== GAME START =====
+    function startGame(operation) {
+      state.operation = operation;
+      state.score = 0; state.streak = 0; state.bestStreak = 0;
+      state.level = 1; state.questionsAnswered = 0; state.questionsCorrect = 0;
+      state.currentAnswer = ''; state.wrongStreak = 0; state.waiting = false;
+
+      updateUI();
+      showScreen('gameScreen');
+      setLabubuState('gameLabubu', 'idle');
+      document.getElementById('labubuHat').classList.remove('show');
+      generateProblem();
+      document.getElementById('answerDisplay').textContent = '\u00A0';
+      document.getElementById('answerDisplay').className = 'answer-display';
+      hideFeedback();
+
+      playGameStartSound();
       setTimeout(() => {
-        if (!state.waiting) setLabubuState('gameLabubu', 'idle');
-      }, 2500);
-    }
-  }, 8000);
-}
-
-// ===== GAME START =====
-function startGame(operation) {
-  state.operation = operation;
-  state.score = 0; state.streak = 0; state.bestStreak = 0;
-  state.level = 1; state.questionsAnswered = 0; state.questionsCorrect = 0;
-  state.currentAnswer = ''; state.wrongStreak = 0; state.waiting = false;
-
-  updateUI();
-  showScreen('gameScreen');
-  setLabubuState('gameLabubu', 'idle');
-  document.getElementById('labubuHat').classList.remove('show');
-  generateProblem();
-  document.getElementById('answerDisplay').textContent = '\u00A0';
-  document.getElementById('answerDisplay').className = 'answer-display';
-  hideFeedback();
-
-  playGameStartSound();
-  setTimeout(() => {
-    speakRandom('gameStart');
-    showBubble('gameBubble', 'You can do it! 💪', 2500);
-  }, 300);
-}
-
-function toggleVoice() {
-  speechEnabled = !speechEnabled;
-  const btn = document.getElementById('voiceToggle');
-  btn.textContent = speechEnabled ? '🔊' : '🔇';
-  btn.classList.toggle('off', !speechEnabled);
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
-}
-
-// ===== INPUT =====
-function numPress(n) {
-  if (state.waiting) return;
-  playClickSound();
-  if (state.currentAnswer.length >= 3) return;
-  state.currentAnswer += n.toString();
-  const ad = document.getElementById('answerDisplay');
-  ad.textContent = state.currentAnswer;
-  ad.classList.add('typing');
-
-  // Button bounce
-  event.target.classList.add('pressed');
-  setTimeout(() => event.target.classList.remove('pressed'), 200);
-}
-
-function clearAnswer() {
-  if (state.waiting) return;
-  playClickSound();
-  state.currentAnswer = '';
-  const ad = document.getElementById('answerDisplay');
-  ad.textContent = '\u00A0';
-  ad.classList.remove('typing');
-}
-
-document.addEventListener('keydown', (e) => {
-  if (!document.getElementById('gameScreen').classList.contains('active')) return;
-  if (state.waiting) return;
-  if (e.key >= '0' && e.key <= '9') numPress(parseInt(e.key));
-  else if (e.key === 'Enter') submitAnswer();
-  else if (e.key === 'Backspace' || e.key === 'Delete') clearAnswer();
-});
-
-// ===== SUBMIT =====
-function submitAnswer() {
-  if (state.waiting || state.currentAnswer === '') return;
-  state.waiting = true;
-  clearTimeout(state.thinkTimer);
-
-  const userAnswer = parseInt(state.currentAnswer);
-  const answerEl = document.getElementById('answerDisplay');
-  answerEl.classList.remove('typing');
-
-  // Get position for emoji burst
-  const rect = answerEl.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top;
-
-  if (userAnswer === state.correctAnswer) {
-    // ===== CORRECT =====
-    state.score++;
-    state.streak++;
-    state.questionsCorrect++;
-    state.wrongStreak = 0;
-    if (state.streak > state.bestStreak) state.bestStreak = state.streak;
-
-    answerEl.classList.add('correct');
-    playCorrectSound();
-
-    // Animate score
-    const sd = document.getElementById('scoreDisplay');
-    sd.classList.add('pop');
-    setTimeout(() => sd.classList.remove('pop'), 500);
-
-    // Star collect at answer position
-    starCollectAnim(cx, cy);
-
-    // Streak-based reactions
-    if (state.streak >= 10) {
-      setLabubuState('gameLabubu', 'excited');
-      showFeedback(true, true);
-      setTimeout(() => { playComboBreaker(); speakRandom('streak10'); }, 300);
-      emojiBurst(['🔥', '⚡', '💥', '🌟', '👑'], cx, cy, 8);
-      spawnConfetti(30);
-      showBubble('gameBubble', '10 IN A ROW!! 🤯', 2500);
-      const sd2 = document.getElementById('streakDisplay');
-      sd2.classList.add('fire');
-      setTimeout(() => sd2.classList.remove('fire'), 600);
-    } else if (state.streak >= 5) {
-      setLabubuState('gameLabubu', 'excited');
-      showFeedback(true, true);
-      setTimeout(() => { playComboBreaker(); speakRandom('streak5'); }, 300);
-      emojiBurst(['🔥', '⭐', '✨', '💫'], cx, cy, 6);
-      spawnConfetti(20);
-      showBubble('gameBubble', 'MEGA STREAK! 🔥', 2000);
-    } else if (state.streak >= 3 && state.streak % 3 === 0) {
-      setLabubuState('gameLabubu', 'happy');
-      showFeedback(true);
-      setTimeout(() => { playStreakSound(); speakRandom('streak3'); }, 300);
-      emojiBurst(['⭐', '✨', '🎉'], cx, cy, 4);
-      spawnConfetti(12);
-      showBubble('gameBubble', 'On fire! 🔥', 2000);
-    } else {
-      setLabubuState('gameLabubu', 'happy');
-      showFeedback(true);
-      setTimeout(() => speakRandom('correct'), 250);
-      emojiBurst(['⭐', '✨', '💛'], cx, cy, 3);
-      spawnConfetti(8);
+        speakRandom('gameStart');
+        showBubble('gameBubble', 'You can do it! 💪', 2500);
+      }, 300);
     }
 
-    // Difficulty scaling
-    if (state.streak % 3 === 0 && state.level < 3) {
-      state.level++;
-      const lb = document.getElementById('levelBadge');
-      lb.classList.add('levelup');
-      setTimeout(() => lb.classList.remove('levelup'), 700);
+    function toggleVoice() {
+      speechEnabled = !speechEnabled;
+      const btn = document.getElementById('voiceToggle');
+      btn.textContent = speechEnabled ? '🔊' : '🔇';
+      btn.classList.toggle('off', !speechEnabled);
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
     }
 
-    // Milestone: hat at every 5
-    if (state.questionsCorrect % 5 === 0 && state.questionsCorrect > 0) {
-      document.getElementById('labubuHat').classList.add('show');
-      playMilestoneSound();
-      setTimeout(() => speakRandom('milestone5'), 400);
-      showBubble('gameBubble', `${state.questionsCorrect} stars! 🌟`, 2500);
-      setTimeout(() => document.getElementById('labubuHat').classList.remove('show'), 3000);
+    // ===== INPUT =====
+    function numPress(n) {
+      if (state.waiting) return;
+      playClickSound();
+      if (state.currentAnswer.length >= 3) return;
+      state.currentAnswer += n.toString();
+      const ad = document.getElementById('answerDisplay');
+      ad.textContent = state.currentAnswer;
+      ad.classList.add('typing');
+
+      // Button bounce
+      event.target.classList.add('pressed');
+      setTimeout(() => event.target.classList.remove('pressed'), 200);
     }
 
-    // Level up at every 10
-    if (state.questionsCorrect % 10 === 0 && state.questionsCorrect > 0) {
-      showLevelUp();
-      playLevelUpSound();
-      setTimeout(() => speakRandom('milestone10'), 500);
+    function clearAnswer() {
+      if (state.waiting) return;
+      playClickSound();
+      state.currentAnswer = '';
+      const ad = document.getElementById('answerDisplay');
+      ad.textContent = '\u00A0';
+      ad.classList.remove('typing');
     }
 
-  } else {
-    // ===== WRONG =====
-    state.streak = 0;
-    state.wrongStreak++;
+    document.addEventListener('keydown', (e) => {
+      if (!document.getElementById('gameScreen').classList.contains('active')) return;
+      if (state.waiting) return;
+      if (e.key >= '0' && e.key <= '9') numPress(parseInt(e.key));
+      else if (e.key === 'Enter') submitAnswer();
+      else if (e.key === 'Backspace' || e.key === 'Delete') clearAnswer();
+    });
 
-    answerEl.classList.add('wrong');
-    setLabubuState('gameLabubu', 'sad');
-    showFeedback(false);
-    playEncouragementSound();
-    setTimeout(() => speakRandom('wrong'), 350);
+    // ===== SUBMIT =====
+    function submitAnswer() {
+      if (state.waiting || state.currentAnswer === '') return;
+      state.waiting = true;
+      clearTimeout(state.thinkTimer);
 
-    emojiBurst(['💪', '🤗', '💖'], cx, cy, 2);
-    showBubble('gameBubble', `It's ${state.correctAnswer}! No worries! 💕`, 2500);
+      const userAnswer = parseInt(state.currentAnswer);
+      const answerEl = document.getElementById('answerDisplay');
+      answerEl.classList.remove('typing');
 
-    if (state.wrongStreak >= 2 && state.level > 1) {
-      state.level--;
-      state.wrongStreak = 0;
+      // Get position for emoji burst
+      const rect = answerEl.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top;
+
+      if (userAnswer === state.correctAnswer) {
+        // ===== CORRECT =====
+        state.score++;
+        state.streak++;
+        state.questionsCorrect++;
+        state.wrongStreak = 0;
+        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+
+        answerEl.classList.add('correct');
+        playCorrectSound();
+
+        // Animate score
+        const sd = document.getElementById('scoreDisplay');
+        sd.classList.add('pop');
+        setTimeout(() => sd.classList.remove('pop'), 500);
+
+        // Star collect at answer position
+        starCollectAnim(cx, cy);
+
+        // Streak-based reactions
+        if (state.streak >= 10) {
+          setLabubuState('gameLabubu', 'excited');
+          showFeedback(true, true);
+          setTimeout(() => { playComboBreaker(); speakRandom('streak10'); }, 300);
+          emojiBurst(['🔥', '⚡', '💥', '🌟', '👑'], cx, cy, 8);
+          spawnConfetti(30);
+          showBubble('gameBubble', '10 IN A ROW!! 🤯', 2500);
+          const sd2 = document.getElementById('streakDisplay');
+          sd2.classList.add('fire');
+          setTimeout(() => sd2.classList.remove('fire'), 600);
+        } else if (state.streak >= 5) {
+          setLabubuState('gameLabubu', 'excited');
+          showFeedback(true, true);
+          setTimeout(() => { playComboBreaker(); speakRandom('streak5'); }, 300);
+          emojiBurst(['🔥', '⭐', '✨', '💫'], cx, cy, 6);
+          spawnConfetti(20);
+          showBubble('gameBubble', 'MEGA STREAK! 🔥', 2000);
+        } else if (state.streak >= 3 && state.streak % 3 === 0) {
+          setLabubuState('gameLabubu', 'happy');
+          showFeedback(true);
+          setTimeout(() => { playStreakSound(); speakRandom('streak3'); }, 300);
+          emojiBurst(['⭐', '✨', '🎉'], cx, cy, 4);
+          spawnConfetti(12);
+          showBubble('gameBubble', 'On fire! 🔥', 2000);
+        } else {
+          setLabubuState('gameLabubu', 'happy');
+          showFeedback(true);
+          setTimeout(() => speakRandom('correct'), 250);
+          emojiBurst(['⭐', '✨', '💛'], cx, cy, 3);
+          spawnConfetti(8);
+        }
+
+        // Difficulty scaling
+        if (state.streak % 3 === 0 && state.level < 3) {
+          state.level++;
+          const lb = document.getElementById('levelBadge');
+          lb.classList.add('levelup');
+          setTimeout(() => lb.classList.remove('levelup'), 700);
+        }
+
+        // Milestone: hat at every 5
+        if (state.questionsCorrect % 5 === 0 && state.questionsCorrect > 0) {
+          document.getElementById('labubuHat').classList.add('show');
+          playMilestoneSound();
+          setTimeout(() => speakRandom('milestone5'), 400);
+          showBubble('gameBubble', `${state.questionsCorrect} stars! 🌟`, 2500);
+          setTimeout(() => document.getElementById('labubuHat').classList.remove('show'), 3000);
+        }
+
+        // Level up at every 10
+        if (state.questionsCorrect % 10 === 0 && state.questionsCorrect > 0) {
+          showLevelUp();
+          playLevelUpSound();
+          setTimeout(() => speakRandom('milestone10'), 500);
+        }
+
+      } else {
+        // ===== WRONG =====
+        state.streak = 0;
+        state.wrongStreak++;
+
+        answerEl.classList.add('wrong');
+        setLabubuState('gameLabubu', 'sad');
+        showFeedback(false);
+        playEncouragementSound();
+        setTimeout(() => speakRandom('wrong'), 350);
+
+        emojiBurst(['💪', '🤗', '💖'], cx, cy, 2);
+        showBubble('gameBubble', `It's ${state.correctAnswer}! No worries! 💕`, 2500);
+
+        if (state.wrongStreak >= 2 && state.level > 1) {
+          state.level--;
+          state.wrongStreak = 0;
+        }
+      }
+
+      state.questionsAnswered++;
+      updateUI();
+
+      setTimeout(() => {
+        if (state.questionsAnswered >= state.totalQuestions) {
+          showSummary();
+          return;
+        }
+        state.currentAnswer = '';
+        answerEl.textContent = '\u00A0';
+        answerEl.className = 'answer-display';
+        setLabubuState('gameLabubu', 'idle');
+        hideFeedback();
+        generateProblem();
+        state.waiting = false;
+      }, 1800);
     }
-  }
 
-  state.questionsAnswered++;
-  updateUI();
-
-  setTimeout(() => {
-    if (state.questionsAnswered >= state.totalQuestions) {
-      showSummary();
-      return;
+    // ===== UI =====
+    function updateUI() {
+      document.getElementById('scoreVal').textContent = state.score;
+      document.getElementById('streakVal').textContent = state.streak;
+      document.getElementById('levelBadge').textContent = `Level ${state.level}`;
+      const pct = (state.questionsAnswered / state.totalQuestions) * 100;
+      document.getElementById('progressBar').style.width = pct + '%';
     }
-    state.currentAnswer = '';
-    answerEl.textContent = '\u00A0';
-    answerEl.className = 'answer-display';
-    setLabubuState('gameLabubu', 'idle');
-    hideFeedback();
-    generateProblem();
-    state.waiting = false;
-  }, 1800);
-}
 
-// ===== UI =====
-function updateUI() {
-  document.getElementById('scoreVal').textContent = state.score;
-  document.getElementById('streakVal').textContent = state.streak;
-  document.getElementById('levelBadge').textContent = `Level ${state.level}`;
-  const pct = (state.questionsAnswered / state.totalQuestions) * 100;
-  document.getElementById('progressBar').style.width = pct + '%';
-}
+    const correctMessages = [
+      "Amazing! ⭐", "Awesome! 🌟", "You're a star! ✨", "Fantastic! 💫",
+      "Super! 🎉", "Brilliant! 🧠", "Wow! 🤩", "Math genius! 🎓",
+      "Incredible! 💪", "Keep going! 🚀", "Nailed it! 🎯", "Perfect! 💯"
+    ];
+    const correctMessagesSuper = [
+      "UNSTOPPABLE! 🔥", "LEGENDARY! 👑", "MEGA COMBO! ⚡",
+      "SUPERSTAR! 🌟", "ON FIRE! 💥"
+    ];
+    const wrongMessages = [
+      "Almost! The answer was {a} 💪",
+      "Not quite! It's {a} 🤗",
+      "Good try! It was {a} 💕",
+      "So close! The answer is {a} 🌈"
+    ];
 
-const correctMessages = [
-  "Amazing! ⭐", "Awesome! 🌟", "You're a star! ✨", "Fantastic! 💫",
-  "Super! 🎉", "Brilliant! 🧠", "Wow! 🤩", "Math genius! 🎓",
-  "Incredible! 💪", "Keep going! 🚀", "Nailed it! 🎯", "Perfect! 💯"
-];
-const correctMessagesSuper = [
-  "UNSTOPPABLE! 🔥", "LEGENDARY! 👑", "MEGA COMBO! ⚡",
-  "SUPERSTAR! 🌟", "ON FIRE! 💥"
-];
-const wrongMessages = [
-  "Almost! The answer was {a} 💪",
-  "Not quite! It's {a} 🤗",
-  "Good try! It was {a} 💕",
-  "So close! The answer is {a} 🌈"
-];
+    function showFeedback(isCorrect, isSuper = false) {
+      const el = document.getElementById('feedback');
+      if (isCorrect) {
+        const msgs = isSuper ? correctMessagesSuper : correctMessages;
+        el.textContent = msgs[randInt(0, msgs.length - 1)];
+        el.className = 'feedback show correct-msg';
+      } else {
+        el.textContent = wrongMessages[randInt(0, wrongMessages.length - 1)]
+          .replace('{a}', state.correctAnswer);
+        el.className = 'feedback show wrong-msg';
+      }
+    }
+    function hideFeedback() {
+      document.getElementById('feedback').className = 'feedback';
+    }
 
-function showFeedback(isCorrect, isSuper = false) {
-  const el = document.getElementById('feedback');
-  if (isCorrect) {
-    const msgs = isSuper ? correctMessagesSuper : correctMessages;
-    el.textContent = msgs[randInt(0, msgs.length - 1)];
-    el.className = 'feedback show correct-msg';
-  } else {
-    el.textContent = wrongMessages[randInt(0, wrongMessages.length - 1)]
-      .replace('{a}', state.correctAnswer);
-    el.className = 'feedback show wrong-msg';
-  }
-}
-function hideFeedback() {
-  document.getElementById('feedback').className = 'feedback';
-}
+    function setLabubuState(id, stateName) {
+      document.getElementById(id).className = 'labubu ' + stateName;
+    }
 
-function setLabubuState(id, stateName) {
-  document.getElementById(id).className = 'labubu ' + stateName;
-}
+    // ===== CONFETTI =====
+    function spawnConfetti(count) {
+      const container = document.getElementById('confettiContainer');
+      const colors = ['#FFB6C1', '#C8A2C8', '#98D8C8', '#FFE66D', '#FF7675', '#74B9FF', '#DDA0DD', '#FF9FF3', '#A29BFE'];
+      const shapes = ['50%', '2px', '0'];
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = randInt(5, 95) + '%';
+        piece.style.background = colors[randInt(0, colors.length - 1)];
+        piece.style.borderRadius = shapes[randInt(0, shapes.length - 1)];
+        piece.style.width = randInt(6, 14) + 'px';
+        piece.style.height = randInt(6, 14) + 'px';
+        piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        piece.style.animationDelay = (Math.random() * 0.6) + 's';
+        container.appendChild(piece);
+        setTimeout(() => piece.remove(), 4000);
+      }
+    }
 
-// ===== CONFETTI =====
-function spawnConfetti(count) {
-  const container = document.getElementById('confettiContainer');
-  const colors = ['#FFB6C1', '#C8A2C8', '#98D8C8', '#FFE66D', '#FF7675', '#74B9FF', '#DDA0DD', '#FF9FF3', '#A29BFE'];
-  const shapes = ['50%', '2px', '0'];
-  for (let i = 0; i < count; i++) {
-    const piece = document.createElement('div');
-    piece.className = 'confetti-piece';
-    piece.style.left = randInt(5, 95) + '%';
-    piece.style.background = colors[randInt(0, colors.length - 1)];
-    piece.style.borderRadius = shapes[randInt(0, shapes.length - 1)];
-    piece.style.width = randInt(6, 14) + 'px';
-    piece.style.height = randInt(6, 14) + 'px';
-    piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
-    piece.style.animationDelay = (Math.random() * 0.6) + 's';
-    container.appendChild(piece);
-    setTimeout(() => piece.remove(), 4000);
-  }
-}
+    // ===== LEVEL UP =====
+    function showLevelUp() {
+      const overlay = document.getElementById('levelUpOverlay');
+      const emojis = ['🏆', '🎉', '🌟', '👑', '🚀'];
+      document.getElementById('levelUpEmoji').textContent = emojis[randInt(0, emojis.length - 1)];
+      document.getElementById('levelUpMsg').textContent =
+        `${state.questionsCorrect} correct! You're on fire, ${state.playerName}!`;
+      overlay.classList.add('show');
+      spawnConfetti(50);
+      setTimeout(() => overlay.classList.remove('show'), 2800);
+    }
 
-// ===== LEVEL UP =====
-function showLevelUp() {
-  const overlay = document.getElementById('levelUpOverlay');
-  const emojis = ['🏆', '🎉', '🌟', '👑', '🚀'];
-  document.getElementById('levelUpEmoji').textContent = emojis[randInt(0, emojis.length - 1)];
-  document.getElementById('levelUpMsg').textContent =
-    `${state.questionsCorrect} correct! You're on fire, ${state.playerName}!`;
-  overlay.classList.add('show');
-  spawnConfetti(50);
-  setTimeout(() => overlay.classList.remove('show'), 2800);
-}
+    // ===== SUMMARY =====
+    function showSummary() {
+      clearTimeout(state.thinkTimer);
+      const accuracy = state.questionsAnswered > 0
+        ? Math.round((state.questionsCorrect / state.questionsAnswered) * 100) : 0;
 
-// ===== SUMMARY =====
-function showSummary() {
-  clearTimeout(state.thinkTimer);
-  const accuracy = state.questionsAnswered > 0
-    ? Math.round((state.questionsCorrect / state.questionsAnswered) * 100) : 0;
+      document.getElementById('sumStars').textContent = state.score;
+      document.getElementById('sumAccuracy').textContent = accuracy + '%';
+      document.getElementById('sumStreak').textContent = state.bestStreak;
 
-  document.getElementById('sumStars').textContent = state.score;
-  document.getElementById('sumAccuracy').textContent = accuracy + '%';
-  document.getElementById('sumStreak').textContent = state.bestStreak;
+      let msg, bubbleText;
+      if (accuracy >= 90) {
+        msg = `Incredible, ${state.playerName}! You're a math superstar!`;
+        bubbleText = 'You\'re AMAZING! 🏆';
+        setLabubuState('summaryLabubu', 'excited');
+      } else if (accuracy >= 70) {
+        msg = `Great job, ${state.playerName}! Keep practicing!`;
+        bubbleText = 'So proud of you! 💪';
+        setLabubuState('summaryLabubu', 'happy');
+      } else if (accuracy >= 50) {
+        msg = `Nice effort, ${state.playerName}! You're learning fast!`;
+        bubbleText = 'Keep going! 🌟';
+        setLabubuState('summaryLabubu', 'happy');
+      } else {
+        msg = `Good try, ${state.playerName}! Practice makes perfect!`;
+        bubbleText = 'You\'ll get there! 💕';
+        setLabubuState('summaryLabubu', 'idle');
+      }
+      document.getElementById('summaryMsg').textContent = msg;
 
-  let msg, bubbleText;
-  if (accuracy >= 90) {
-    msg = `Incredible, ${state.playerName}! You're a math superstar!`;
-    bubbleText = 'You\'re AMAZING! 🏆';
-    setLabubuState('summaryLabubu', 'excited');
-  } else if (accuracy >= 70) {
-    msg = `Great job, ${state.playerName}! Keep practicing!`;
-    bubbleText = 'So proud of you! 💪';
-    setLabubuState('summaryLabubu', 'happy');
-  } else if (accuracy >= 50) {
-    msg = `Nice effort, ${state.playerName}! You're learning fast!`;
-    bubbleText = 'Keep going! 🌟';
-    setLabubuState('summaryLabubu', 'happy');
-  } else {
-    msg = `Good try, ${state.playerName}! Practice makes perfect!`;
-    bubbleText = 'You\'ll get there! 💕';
-    setLabubuState('summaryLabubu', 'idle');
-  }
-  document.getElementById('summaryMsg').textContent = msg;
+      showScreen('summaryScreen');
+      spawnConfetti(35);
+      playSummarySound();
 
-  showScreen('summaryScreen');
-  spawnConfetti(35);
-  playSummarySound();
+      setTimeout(() => {
+        showBubble('summaryBubble', bubbleText, 4000);
+        if (accuracy >= 90) speakRandom('gameEnd90');
+        else if (accuracy >= 70) speakRandom('gameEnd70');
+        else if (accuracy >= 50) speakRandom('gameEnd50');
+        else speakRandom('gameEndLow');
+      }, 600);
+    }
 
-  setTimeout(() => {
-    showBubble('summaryBubble', bubbleText, 4000);
-    if (accuracy >= 90) speakRandom('gameEnd90');
-    else if (accuracy >= 70) speakRandom('gameEnd70');
-    else if (accuracy >= 50) speakRandom('gameEnd50');
-    else speakRandom('gameEndLow');
-  }, 600);
-}
-
-// ===== NAME INPUT =====
-document.getElementById('playerName').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') goToSelect();
-});
-</script>
+    // ===== NAME INPUT =====
+    document.getElementById('playerName').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') goToSelect();
+    });
+  </script>
 </body>
+
 </html>

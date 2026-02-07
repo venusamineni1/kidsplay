@@ -1920,6 +1920,7 @@
       <button class="op-btn mix-btn" onclick="startGame('mix')"><span class="op-icon">🎲</span>Mix It Up!</button>
       <button class="op-btn words-btn" onclick="startGame('words')"><span class="op-icon">📚</span>Site Words</button>
       <button class="op-btn spell-btn" onclick="startGame('spelling')"><span class="op-icon">🔤</span>Spelling</button>
+      <button class="op-btn joke-btn" onclick="tellJoke()"><span class="op-icon">😂</span>Tell me a Joke</button>
     </div>
   </div>
 
@@ -2002,6 +2003,42 @@
       color: #FFF;
       font-size: 1.3rem;
       border: none;
+    }
+
+    .joke-btn {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #FF9A9E, #FECFEF);
+      color: #D980FA;
+      font-size: 1.3rem;
+      border: none;
+      margin-top: 10px;
+    }
+
+    .read-btn {
+      position: absolute;
+      top: 60px;
+      right: 15px;
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.1rem;
+      padding: 8px 14px;
+      border: 2px solid var(--lavender);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      z-index: 5;
+      display: none;
+      /* Hidden by default */
+      color: #6A5ACD;
+    }
+
+    .read-btn:hover {
+      background: white;
+      transform: scale(1.05);
+    }
+
+    .screen.word-mode .read-btn,
+    .screen.spell-mode .read-btn {
+      display: block;
     }
 
     .spelling-area {
@@ -2098,6 +2135,7 @@
   <div class="screen" id="gameScreen">
     <button class="quit-btn" onclick="quitGame()">← Back</button>
     <button class="voice-toggle" id="voiceToggle" onclick="toggleVoice()">🔊</button>
+    <button class="read-btn" id="readBtn" onclick="readCurrentWord()">👂 Read Word</button>
 
     <div class="game-header">
       <div class="score-display" id="scoreDisplay">⭐ <span id="scoreVal">0</span></div>
@@ -2381,6 +2419,24 @@
       ]
     };
 
+    const jokes = [
+      { q: "What do you call a bear with no teeth?", a: "A gummy bear!" },
+      { q: "Why did the cookie go to the hospital?", a: "Because he felt crummy!" },
+      { q: "What do you call a sleeping dinosaur?", a: "A dino-snore!" },
+      { q: "What kind of room has no doors or windows?", a: "A mushroom!" },
+      { q: "Why did the banana go to the doctor?", a: "Because it wasn't peeling well!" },
+      { q: "What do you call a pig that does karate?", a: "A pork chop!" },
+      { q: "Why are fish so smart?", a: "Because they live in schools!" },
+      { q: "What falls in winter but never gets hurt?", a: "Snow!" },
+      { q: "Why did the golfer wear two pairs of pants?", a: "In case he got a hole in one!" },
+      { q: "What do you call a cow with no legs?", a: "Ground beef!" },
+      { q: "What kind of dog corrects your math homework?", a: "A Lab-racadabrador!" }, // Just kidding, could be a calculator dog? No, let's go with...
+      { q: "What is a math teacher's favorite place?", a: "Times Square!" },
+      { q: "Why was 6 afraid of 7?", a: "Because 7 8 9!" },
+      { q: "What is a snake's favorite subject?", a: "Hiss-tory!" },
+      { q: "Where do cows go for entertainment?", a: "To the moo-vies!" }
+    ];
+
     let speechEnabled = true;
     let lastSpoke = 0;
 
@@ -2405,6 +2461,42 @@
     function speakRandom(category) {
       const lines = voiceLines[category];
       if (lines) speak(lines[randInt(0, lines.length - 1)]);
+    }
+
+    function tellJoke() {
+      // Pick random joke
+      const joke = jokes[randInt(0, jokes.length - 1)];
+
+      // Visuals
+      const labubu = document.getElementById('selectLabubu');
+      setLabubuState('selectLabubu', 'happy');
+
+      // Speak Q
+      showBubble('selectBubble', joke.q, 3000);
+      speak(joke.q);
+
+      // Wait for A
+      setTimeout(() => {
+        setLabubuState('selectLabubu', 'excited');
+        showBubble('selectBubble', joke.a, 3000);
+        speak(joke.a);
+        playCorrectSound(); // Or a laugh sound if we had one
+
+        // Reset state after joke
+        setTimeout(() => {
+          setLabubuState('selectLabubu', 'idle');
+          showBubble('selectBubble', 'Pick a challenge!', 2000);
+        }, 3500);
+      }, 3500); // Wait 3.5s for Q to finish roughly
+    }
+
+    function readCurrentWord() {
+      if (!state.correctAnswer) return;
+      if (state.operation === 'spelling') {
+        speakComforting(state.correctAnswer);
+      } else {
+        speak(state.correctAnswer);
+      }
     }
 
     if (window.speechSynthesis) {

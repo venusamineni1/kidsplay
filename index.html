@@ -2128,6 +2128,569 @@
 
     /* Cape - requires structural change or tricky positioning, let's stick to pseudo for now */
 
+    /* ===== DRESS-UP GAME ===== */
+    .dressup-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 800px;
+      height: 85vh;
+      padding: 10px;
+    }
+
+    .dressup-top {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .dressup-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #FFF5E6 0%, #FFE6F0 50%, #E8D5F5 100%);
+      border-radius: 25px;
+      padding: 20px;
+      position: relative;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .dressup-stage::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(180deg, transparent, rgba(200,162,200,0.2));
+      border-radius: 0 0 25px 25px;
+    }
+
+    .dressup-doll {
+      position: relative;
+      width: 220px;
+      height: 280px;
+    }
+
+    .doll-body {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 175px;
+      background: var(--labubu-body);
+      border-radius: 70px 70px 55px 55px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1), inset 0 -5px 15px rgba(0,0,0,0.05);
+      z-index: 2;
+    }
+
+    .doll-ear {
+      position: absolute;
+      width: 40px;
+      height: 72px;
+      background: var(--labubu-ear);
+      border-radius: 50% 50% 30% 30%;
+      top: 0;
+      z-index: 3;
+    }
+
+    .doll-ear.left {
+      left: 22px;
+      transform: rotate(-20deg);
+    }
+
+    .doll-ear.right {
+      right: 22px;
+      transform: rotate(20deg);
+    }
+
+    .doll-ear::after {
+      content: '';
+      position: absolute;
+      width: 60%;
+      height: 70%;
+      background: #FFD1DC;
+      border-radius: inherit;
+      top: 15%;
+      left: 20%;
+    }
+
+    .doll-face {
+      position: absolute;
+      width: 120px;
+      height: 105px;
+      background: var(--labubu-face);
+      border-radius: 50%;
+      top: 42px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 4;
+    }
+
+    .doll-eye {
+      position: absolute;
+      width: 26px;
+      height: 28px;
+      background: #2D2D2D;
+      border-radius: 50%;
+      top: 28px;
+      z-index: 5;
+    }
+
+    .doll-eye.left { left: 22px; }
+    .doll-eye.right { right: 22px; }
+
+    .doll-eye::before {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: white;
+      border-radius: 50%;
+      top: 4px;
+      left: 4px;
+    }
+
+    .doll-eye::after {
+      content: '';
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      background: white;
+      border-radius: 50%;
+      bottom: 6px;
+      right: 4px;
+    }
+
+    .doll-mouth {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 45px;
+      height: 22px;
+      z-index: 5;
+    }
+
+    .doll-mouth-shape {
+      width: 100%;
+      height: 100%;
+      background: #FF6B81;
+      border-radius: 0 0 25px 25px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .doll-teeth {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 2px;
+    }
+
+    .doll-teeth .tooth {
+      width: 9px;
+      height: 10px;
+      background: white;
+      border-radius: 0 0 4px 4px;
+    }
+
+    .doll-blush {
+      position: absolute;
+      width: 22px;
+      height: 13px;
+      background: rgba(255,150,150,0.5);
+      border-radius: 50%;
+      top: 55px;
+      z-index: 5;
+    }
+
+    .doll-blush.left { left: 5px; }
+    .doll-blush.right { right: 5px; }
+
+    .doll-arm {
+      position: absolute;
+      width: 32px;
+      height: 65px;
+      background: var(--labubu-body);
+      border-radius: 18px;
+      top: 78px;
+      z-index: 1;
+    }
+
+    .doll-arm.left {
+      left: 2px;
+      transform: rotate(15deg);
+      transform-origin: top center;
+    }
+
+    .doll-arm.right {
+      right: 2px;
+      transform: rotate(-15deg);
+      transform-origin: top center;
+    }
+
+    .doll-foot {
+      position: absolute;
+      width: 40px;
+      height: 24px;
+      background: var(--labubu-body);
+      border-radius: 50%;
+      bottom: 12px;
+      z-index: 1;
+    }
+
+    .doll-foot.left { left: 30px; }
+    .doll-foot.right { right: 30px; }
+
+    /* Clothing layers on the doll */
+    .doll-clothing-layer {
+      position: absolute;
+      z-index: 6;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .doll-hat-layer {
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 55px;
+      z-index: 10;
+      animation: hatLand 0.4s ease-out;
+    }
+
+    .doll-top-layer {
+      top: 105px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 80px;
+      border-radius: 30px 30px 20px 20px;
+      z-index: 3;
+      animation: clothLand 0.3s ease-out;
+    }
+
+    .doll-bottom-layer {
+      top: 160px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 130px;
+      height: 50px;
+      border-radius: 10px 10px 25px 25px;
+      z-index: 3;
+      animation: clothLand 0.3s ease-out;
+    }
+
+    .doll-shoes-layer {
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 30px;
+      z-index: 3;
+      animation: clothLand 0.3s ease-out;
+    }
+
+    .doll-accessory-layer {
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 35px;
+      z-index: 11;
+      animation: hatLand 0.4s ease-out;
+    }
+
+    @keyframes hatLand {
+      0% { transform: translateX(-50%) translateY(-40px) rotate(-15deg); opacity: 0; }
+      60% { transform: translateX(-50%) translateY(5px) rotate(3deg); opacity: 1; }
+      100% { transform: translateX(-50%) translateY(0) rotate(0deg); opacity: 1; }
+    }
+
+    @keyframes clothLand {
+      0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+      70% { transform: translateX(-50%) scale(1.05); opacity: 1; }
+      100% { transform: translateX(-50%) scale(1); opacity: 1; }
+    }
+
+    /* Wardrobe panel */
+    .dressup-wardrobe {
+      width: 260px;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      border-radius: 25px;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .wardrobe-header {
+      background: linear-gradient(135deg, #FF6B9D, #C44569);
+      color: white;
+      padding: 12px 16px;
+      font-size: 1.1rem;
+      font-family: 'Bubblegum Sans', cursive;
+      text-align: center;
+    }
+
+    .wardrobe-tabs {
+      display: flex;
+      background: #f8f0f8;
+      border-bottom: 2px solid #eee;
+    }
+
+    .wardrobe-tab {
+      flex: 1;
+      padding: 10px 4px;
+      border: none;
+      background: transparent;
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      opacity: 0.5;
+    }
+
+    .wardrobe-tab.active {
+      opacity: 1;
+      background: white;
+      border-bottom: 3px solid var(--coral);
+    }
+
+    .wardrobe-tab:hover {
+      opacity: 0.8;
+    }
+
+    .wardrobe-items {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .wardrobe-item {
+      background: #FFF5F8;
+      border: 3px solid #FFE0E8;
+      border-radius: 16px;
+      padding: 10px 5px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Bubblegum Sans', cursive;
+    }
+
+    .wardrobe-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(255,107,157,0.2);
+      border-color: var(--coral);
+    }
+
+    .wardrobe-item.equipped {
+      border-color: #FF6B9D;
+      background: linear-gradient(135deg, #FFE0EC, #FFF5F8);
+      box-shadow: 0 0 12px rgba(255,107,157,0.3);
+    }
+
+    .wardrobe-item.locked {
+      opacity: 0.4;
+      cursor: not-allowed;
+      filter: grayscale(0.5);
+    }
+
+    .wardrobe-item-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .wardrobe-item-name {
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    .wardrobe-item-cost {
+      font-size: 0.65rem;
+      color: #FF6B9D;
+      margin-top: 2px;
+    }
+
+    /* Dressup action buttons */
+    .dressup-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .dressup-btn {
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1rem;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: white;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+
+    .dressup-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .dressup-btn:active {
+      transform: translateY(1px);
+    }
+
+    .dressup-btn.save-outfit { background: linear-gradient(135deg, #56ab2f, #a8e063); }
+    .dressup-btn.random-outfit { background: linear-gradient(135deg, #f7971e, #ffd200); }
+    .dressup-btn.clear-outfit { background: linear-gradient(135deg, #eb3349, #f45c43); }
+    .dressup-btn.gallery-btn { background: linear-gradient(135deg, #667eea, #764ba2); }
+
+    /* Outfit gallery mini */
+    .outfit-gallery {
+      display: none;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .outfit-gallery.show {
+      display: block;
+    }
+
+    .outfit-gallery-title {
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1rem;
+      color: #666;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .outfit-gallery-scroll {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 8px 4px;
+    }
+
+    .saved-outfit-card {
+      min-width: 80px;
+      background: white;
+      border: 3px solid #E8D5F5;
+      border-radius: 15px;
+      padding: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .saved-outfit-card:hover {
+      transform: translateY(-3px);
+      border-color: #C8A2C8;
+      box-shadow: 0 4px 12px rgba(200,162,200,0.3);
+    }
+
+    .saved-outfit-card .outfit-preview {
+      font-size: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .saved-outfit-card .outfit-name {
+      font-size: 0.65rem;
+      color: #888;
+      margin-top: 3px;
+    }
+
+    .dressup-star-count {
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.1rem;
+      color: #FFB347;
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    /* Doll idle animation in dressup */
+    .dressup-doll .doll-body {
+      animation: dollBounce 2.5s ease-in-out infinite;
+    }
+
+    .dressup-doll .doll-ear.left {
+      animation: earWiggle 3s ease-in-out infinite;
+    }
+
+    .dressup-doll .doll-ear.right {
+      animation: earWiggle 3s ease-in-out infinite 0.2s;
+    }
+
+    @keyframes dollBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-6px); }
+    }
+
+    /* Doll happy reaction */
+    .dressup-doll.doll-happy .doll-eye {
+      height: 6px;
+      top: 35px;
+      border-radius: 6px 6px 0 0;
+    }
+
+    .dressup-doll.doll-happy .doll-blush {
+      width: 26px;
+      height: 16px;
+      background: rgba(255,120,120,0.6);
+    }
+
+    .dressup-doll.doll-happy .doll-mouth-shape {
+      width: 50px;
+      height: 26px;
+    }
+
+    .dressup-doll.doll-happy {
+      animation: dollSpin 0.6s ease-out;
+    }
+
+    @keyframes dollSpin {
+      0% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.05) rotate(-5deg); }
+      50% { transform: scale(1.1) rotate(5deg); }
+      75% { transform: scale(1.05) rotate(-3deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    /* Mobile responsive for dressup */
+    @media (max-width: 640px) {
+      .dressup-top {
+        flex-direction: column;
+      }
+
+      .dressup-wardrobe {
+        width: 100%;
+        max-height: 250px;
+      }
+
+      .dressup-doll {
+        transform: scale(0.75);
+      }
+
+      .dressup-stage {
+        min-height: 260px;
+      }
+    }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 480px) {
       .labubu {
@@ -2328,6 +2891,82 @@
     </div>
   </div>
 
+  <!-- DRESS-UP GAME OVERLAY -->
+  <div class="level-up-overlay" id="dressupOverlay">
+    <div class="dressup-container">
+      <div class="shop-header" style="background: linear-gradient(135deg, #FF6B9D, #C44569); width: 100%; border-radius: 20px 20px 0 0; display:flex; justify-content:space-between; align-items:center; padding: 12px 20px;">
+        <h2 style="margin:0; font-size:1.3rem;">Labubu Fashion Studio</h2>
+        <div style="display:flex; align-items:center; gap:15px;">
+          <span class="dressup-star-count" id="dressupStars" style="color:white; margin:0;">0 Stars</span>
+          <button class="close-shop-btn" onclick="closeDressup()">✖</button>
+        </div>
+      </div>
+
+      <div class="dressup-top" style="margin-top:0;">
+        <!-- Stage with doll -->
+        <div class="dressup-stage">
+          <div class="dressup-doll" id="dressupDoll">
+            <div class="doll-ear left"></div>
+            <div class="doll-ear right"></div>
+            <div class="doll-body">
+              <div class="doll-face">
+                <div class="doll-eye left"></div>
+                <div class="doll-eye right"></div>
+                <div class="doll-blush left"></div>
+                <div class="doll-blush right"></div>
+                <div class="doll-mouth">
+                  <div class="doll-mouth-shape">
+                    <div class="doll-teeth">
+                      <div class="tooth"></div>
+                      <div class="tooth"></div>
+                      <div class="tooth"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="doll-arm left"></div>
+            <div class="doll-arm right"></div>
+            <div class="doll-foot left"></div>
+            <div class="doll-foot right"></div>
+            <!-- Clothing layers inserted by JS -->
+            <div id="dollClothingLayers"></div>
+          </div>
+
+          <div class="dressup-actions">
+            <button class="dressup-btn random-outfit" onclick="randomOutfit()">🎲 Random</button>
+            <button class="dressup-btn clear-outfit" onclick="clearOutfit()">✨ Clear</button>
+            <button class="dressup-btn save-outfit" onclick="saveCurrentOutfit()">💾 Save</button>
+            <button class="dressup-btn gallery-btn" onclick="toggleOutfitGallery()">👗 Outfits</button>
+          </div>
+
+          <!-- Outfit gallery -->
+          <div class="outfit-gallery" id="outfitGallery">
+            <div class="outfit-gallery-title">Saved Outfits</div>
+            <div class="outfit-gallery-scroll" id="outfitGalleryScroll">
+              <!-- JS generated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Wardrobe -->
+        <div class="dressup-wardrobe">
+          <div class="wardrobe-header">Wardrobe</div>
+          <div class="wardrobe-tabs" id="wardrobeTabs">
+            <button class="wardrobe-tab active" onclick="switchWardrobeTab('hats')">🎩</button>
+            <button class="wardrobe-tab" onclick="switchWardrobeTab('tops')">👚</button>
+            <button class="wardrobe-tab" onclick="switchWardrobeTab('bottoms')">👖</button>
+            <button class="wardrobe-tab" onclick="switchWardrobeTab('shoes')">👟</button>
+            <button class="wardrobe-tab" onclick="switchWardrobeTab('accessories')">✨</button>
+          </div>
+          <div class="wardrobe-items" id="wardrobeItems">
+            <!-- JS generated -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== WELCOME ==================== -->
   <div class="screen active" id="welcomeScreen">
     <div class="labubu idle wave" id="welcomeLabubu">
@@ -2413,6 +3052,8 @@
         onclick="openStorybook()"><span class="op-icon">📚</span>Storybook</button>
       <button class="op-btn" style="background: linear-gradient(135deg, #1565C0, #0D47A1); color: white;"
         onclick="openHistory()"><span class="op-icon">🇺🇸</span>History</button>
+      <button class="op-btn" style="background: linear-gradient(135deg, #FF6B9D, #C44569); color: white;"
+        onclick="openDressup()"><span class="op-icon">👗</span>Dress Up!</button>
     </div>
   </div>
 
@@ -4580,6 +5221,358 @@
         else if (accuracy >= 50) speakRandom('gameEnd50');
         else speakRandom('gameEndLow');
       }, 600);
+    }
+
+    // ===== DRESS-UP GAME =====
+    const dressupClothing = {
+      hats: [
+        { id: 'crown', name: 'Crown', icon: '👑', cost: 0 },
+        { id: 'tophat', name: 'Top Hat', icon: '🎩', cost: 0 },
+        { id: 'partyhat', name: 'Party Hat', icon: '🥳', cost: 0 },
+        { id: 'cowboy', name: 'Cowboy', icon: '🤠', cost: 10 },
+        { id: 'beret', name: 'Beret', icon: '🎨', cost: 20 },
+        { id: 'helmet', name: 'Helmet', icon: '⛑️', cost: 30 },
+        { id: 'princess', name: 'Princess', icon: '👸', cost: 50 },
+        { id: 'wizard', name: 'Wizard', icon: '🧙', cost: 80 },
+      ],
+      tops: [
+        { id: 'red-top', name: 'Red Dress', color: '#FF6B6B', cost: 0 },
+        { id: 'blue-top', name: 'Blue Shirt', color: '#74B9FF', cost: 0 },
+        { id: 'pink-top', name: 'Pink Blouse', color: '#FDA7DF', cost: 0 },
+        { id: 'green-top', name: 'Green Tee', color: '#55E6C1', cost: 10 },
+        { id: 'purple-top', name: 'Purple Top', color: '#C8A2C8', cost: 15 },
+        { id: 'rainbow-top', name: 'Rainbow', color: 'linear-gradient(135deg, #FF6B6B, #FFE66D, #55E6C1, #74B9FF, #C8A2C8)', cost: 50 },
+        { id: 'gold-top', name: 'Gold Gown', color: 'linear-gradient(135deg, #FFD700, #FFA500)', cost: 80 },
+        { id: 'star-top', name: 'Star Top', color: 'linear-gradient(135deg, #667eea, #764ba2)', cost: 40 },
+      ],
+      bottoms: [
+        { id: 'blue-skirt', name: 'Blue Skirt', color: '#74B9FF', cost: 0 },
+        { id: 'pink-skirt', name: 'Pink Skirt', color: '#FDA7DF', cost: 0 },
+        { id: 'jeans', name: 'Jeans', color: '#5B8CFF', cost: 0 },
+        { id: 'yellow-shorts', name: 'Sunny Shorts', color: '#FFE66D', cost: 10 },
+        { id: 'purple-skirt', name: 'Purple Skirt', color: '#DDA0DD', cost: 20 },
+        { id: 'rainbow-skirt', name: 'Rainbow', color: 'linear-gradient(135deg, #FF6B6B, #FFE66D, #55E6C1, #74B9FF)', cost: 50 },
+        { id: 'sparkle-pants', name: 'Sparkle', color: 'linear-gradient(135deg, #f5af19, #f12711)', cost: 60 },
+      ],
+      shoes: [
+        { id: 'sneakers', name: 'Sneakers', icon: '👟', cost: 0 },
+        { id: 'boots', name: 'Boots', icon: '👢', cost: 0 },
+        { id: 'heels', name: 'Heels', icon: '👠', cost: 15 },
+        { id: 'sandals', name: 'Sandals', icon: '🩴', cost: 10 },
+        { id: 'ballet', name: 'Ballet', icon: '🩰', cost: 30 },
+        { id: 'skates', name: 'Skates', icon: '⛸️', cost: 50 },
+      ],
+      accessories: [
+        { id: 'glasses', name: 'Shades', icon: '🕶️', cost: 0 },
+        { id: 'bow', name: 'Bow', icon: '🎀', cost: 0 },
+        { id: 'flower', name: 'Flower', icon: '🌸', cost: 5 },
+        { id: 'star', name: 'Star', icon: '⭐', cost: 10 },
+        { id: 'butterfly', name: 'Butterfly', icon: '🦋', cost: 20 },
+        { id: 'sparkles', name: 'Sparkles', icon: '✨', cost: 25 },
+        { id: 'heart', name: 'Heart', icon: '💖', cost: 30 },
+        { id: 'magic', name: 'Magic Wand', icon: '🪄', cost: 60 },
+      ]
+    };
+
+    let currentOutfit = { hat: null, top: null, bottom: null, shoes: null, accessory: null };
+    let currentWardrobeTab = 'hats';
+
+    function openDressup() {
+      document.getElementById('dressupOverlay').classList.add('show');
+      document.getElementById('dressupStars').textContent = state.totalStars + ' Stars ⭐';
+      loadSavedOutfits();
+      switchWardrobeTab('hats');
+      renderDoll();
+      playClickSound();
+    }
+
+    function closeDressup() {
+      document.getElementById('dressupOverlay').classList.remove('show');
+    }
+
+    function switchWardrobeTab(tab) {
+      currentWardrobeTab = tab;
+      document.querySelectorAll('.wardrobe-tab').forEach((t, i) => {
+        const tabs = ['hats', 'tops', 'bottoms', 'shoes', 'accessories'];
+        t.classList.toggle('active', tabs[i] === tab);
+      });
+      renderWardrobe();
+    }
+
+    function renderWardrobe() {
+      const container = document.getElementById('wardrobeItems');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const items = dressupClothing[currentWardrobeTab] || [];
+      const slotMap = { hats: 'hat', tops: 'top', bottoms: 'bottom', shoes: 'shoes', accessories: 'accessory' };
+      const slot = slotMap[currentWardrobeTab];
+
+      items.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'wardrobe-item';
+
+        const isUnlocked = isDressupUnlocked(item.id);
+        const isEquipped = currentOutfit[slot] === item.id;
+
+        if (isEquipped) el.classList.add('equipped');
+        if (!isUnlocked) el.classList.add('locked');
+
+        let iconDisplay = '';
+        if (item.icon) {
+          iconDisplay = `<span class="wardrobe-item-icon">${item.icon}</span>`;
+        } else if (item.color) {
+          const bg = item.color.includes('gradient') ? item.color : item.color;
+          iconDisplay = `<span class="wardrobe-item-icon" style="display:inline-block; width:35px; height:35px; border-radius:10px; background:${bg};"></span>`;
+        }
+
+        let costText = '';
+        if (!isUnlocked) {
+          costText = `<div class="wardrobe-item-cost">${item.cost} ⭐</div>`;
+        } else if (isEquipped) {
+          costText = `<div class="wardrobe-item-cost" style="color:#56ab2f;">Wearing!</div>`;
+        }
+
+        el.innerHTML = `${iconDisplay}<div class="wardrobe-item-name">${item.name}</div>${costText}`;
+
+        el.onclick = () => handleDressupItemClick(item, slot);
+        container.appendChild(el);
+      });
+    }
+
+    function isDressupUnlocked(itemId) {
+      const unlockedKey = `dressup_unlocked_${state.playerName.toLowerCase()}`;
+      const unlocked = JSON.parse(localStorage.getItem(unlockedKey) || '[]');
+      // Items with cost 0 are always unlocked
+      const allItems = Object.values(dressupClothing).flat();
+      const item = allItems.find(i => i.id === itemId);
+      return (item && item.cost === 0) || unlocked.includes(itemId);
+    }
+
+    function unlockDressupItem(itemId) {
+      const unlockedKey = `dressup_unlocked_${state.playerName.toLowerCase()}`;
+      const unlocked = JSON.parse(localStorage.getItem(unlockedKey) || '[]');
+      if (!unlocked.includes(itemId)) {
+        unlocked.push(itemId);
+        localStorage.setItem(unlockedKey, JSON.stringify(unlocked));
+      }
+    }
+
+    function handleDressupItemClick(item, slot) {
+      if (!isDressupUnlocked(item.id)) {
+        // Try to buy
+        if (state.totalStars >= item.cost) {
+          state.totalStars -= item.cost;
+          saveGameState();
+          unlockDressupItem(item.id);
+          document.getElementById('dressupStars').textContent = state.totalStars + ' Stars ⭐';
+          playMilestoneSound();
+          // Equip it
+          equipDressupItem(item, slot);
+        } else {
+          playWrongSound();
+          // Shake the item
+        }
+        return;
+      }
+
+      // Toggle: if already equipped, unequip; otherwise equip
+      if (currentOutfit[slot] === item.id) {
+        currentOutfit[slot] = null;
+        playClickSound();
+      } else {
+        equipDressupItem(item, slot);
+      }
+      renderWardrobe();
+      renderDoll();
+    }
+
+    function equipDressupItem(item, slot) {
+      currentOutfit[slot] = item.id;
+      playCorrectSound();
+      renderWardrobe();
+      renderDoll();
+      triggerDollReaction();
+    }
+
+    function triggerDollReaction() {
+      const doll = document.getElementById('dressupDoll');
+      doll.classList.add('doll-happy');
+      setTimeout(() => doll.classList.remove('doll-happy'), 700);
+    }
+
+    function renderDoll() {
+      const layersContainer = document.getElementById('dollClothingLayers');
+      if (!layersContainer) return;
+      layersContainer.innerHTML = '';
+
+      // Hat
+      if (currentOutfit.hat) {
+        const item = dressupClothing.hats.find(i => i.id === currentOutfit.hat);
+        if (item) {
+          const el = document.createElement('div');
+          el.className = 'doll-clothing-layer doll-hat-layer';
+          el.textContent = item.icon;
+          layersContainer.appendChild(el);
+        }
+      }
+
+      // Top
+      if (currentOutfit.top) {
+        const item = dressupClothing.tops.find(i => i.id === currentOutfit.top);
+        if (item) {
+          const el = document.createElement('div');
+          el.className = 'doll-clothing-layer doll-top-layer';
+          el.style.background = item.color;
+          el.style.borderRadius = '30px 30px 20px 20px';
+          el.style.boxShadow = 'inset 0 -4px 8px rgba(0,0,0,0.1)';
+          layersContainer.appendChild(el);
+        }
+      }
+
+      // Bottom
+      if (currentOutfit.bottom) {
+        const item = dressupClothing.bottoms.find(i => i.id === currentOutfit.bottom);
+        if (item) {
+          const el = document.createElement('div');
+          el.className = 'doll-clothing-layer doll-bottom-layer';
+          el.style.background = item.color;
+          el.style.boxShadow = 'inset 0 -3px 6px rgba(0,0,0,0.1)';
+          layersContainer.appendChild(el);
+        }
+      }
+
+      // Shoes
+      if (currentOutfit.shoes) {
+        const item = dressupClothing.shoes.find(i => i.id === currentOutfit.shoes);
+        if (item) {
+          const el = document.createElement('div');
+          el.className = 'doll-clothing-layer doll-shoes-layer';
+          el.textContent = item.icon;
+          layersContainer.appendChild(el);
+        }
+      }
+
+      // Accessory
+      if (currentOutfit.accessory) {
+        const item = dressupClothing.accessories.find(i => i.id === currentOutfit.accessory);
+        if (item) {
+          const el = document.createElement('div');
+          el.className = 'doll-clothing-layer doll-accessory-layer';
+          el.textContent = item.icon;
+          layersContainer.appendChild(el);
+        }
+      }
+    }
+
+    function clearOutfit() {
+      currentOutfit = { hat: null, top: null, bottom: null, shoes: null, accessory: null };
+      playClickSound();
+      renderDoll();
+      renderWardrobe();
+    }
+
+    function randomOutfit() {
+      const pick = (arr) => {
+        const unlocked = arr.filter(i => isDressupUnlocked(i.id));
+        return unlocked.length > 0 ? unlocked[randInt(0, unlocked.length - 1)].id : null;
+      };
+      currentOutfit.hat = pick(dressupClothing.hats);
+      currentOutfit.top = pick(dressupClothing.tops);
+      currentOutfit.bottom = pick(dressupClothing.bottoms);
+      currentOutfit.shoes = pick(dressupClothing.shoes);
+      currentOutfit.accessory = pick(dressupClothing.accessories);
+      playMilestoneSound();
+      renderDoll();
+      renderWardrobe();
+      triggerDollReaction();
+    }
+
+    function saveCurrentOutfit() {
+      const outfitsKey = `dressup_outfits_${state.playerName.toLowerCase()}`;
+      const outfits = JSON.parse(localStorage.getItem(outfitsKey) || '[]');
+
+      // Check if outfit has at least one item
+      const hasItem = Object.values(currentOutfit).some(v => v !== null);
+      if (!hasItem) {
+        playWrongSound();
+        return;
+      }
+
+      // Max 12 outfits
+      if (outfits.length >= 12) {
+        outfits.shift();
+      }
+
+      outfits.push({ ...currentOutfit, savedAt: Date.now() });
+      localStorage.setItem(outfitsKey, JSON.stringify(outfits));
+      playCorrectSound();
+      renderOutfitGallery();
+
+      // Show gallery if hidden
+      document.getElementById('outfitGallery').classList.add('show');
+    }
+
+    function loadSavedOutfits() {
+      renderOutfitGallery();
+    }
+
+    function renderOutfitGallery() {
+      const outfitsKey = `dressup_outfits_${state.playerName.toLowerCase()}`;
+      const outfits = JSON.parse(localStorage.getItem(outfitsKey) || '[]');
+      const scroll = document.getElementById('outfitGalleryScroll');
+      if (!scroll) return;
+      scroll.innerHTML = '';
+
+      if (outfits.length === 0) {
+        scroll.innerHTML = '<div style="text-align:center; color:#aaa; padding:10px; font-size:0.85rem;">No outfits saved yet!</div>';
+        return;
+      }
+
+      outfits.forEach((outfit, idx) => {
+        const card = document.createElement('div');
+        card.className = 'saved-outfit-card';
+
+        // Build preview icons
+        let preview = '';
+        if (outfit.hat) {
+          const h = dressupClothing.hats.find(i => i.id === outfit.hat);
+          if (h) preview += h.icon;
+        }
+        if (outfit.top) {
+          const t = dressupClothing.tops.find(i => i.id === outfit.top);
+          if (t) preview += `<span style="display:inline-block; width:16px; height:16px; border-radius:4px; background:${t.color}; vertical-align:middle;"></span>`;
+        }
+        if (outfit.shoes) {
+          const s = dressupClothing.shoes.find(i => i.id === outfit.shoes);
+          if (s) preview += s.icon;
+        }
+        if (outfit.accessory) {
+          const a = dressupClothing.accessories.find(i => i.id === outfit.accessory);
+          if (a) preview += a.icon;
+        }
+
+        if (!preview) preview = '👗';
+
+        card.innerHTML = `<div class="outfit-preview">${preview}</div><div class="outfit-name">Look #${idx + 1}</div>`;
+        card.onclick = () => {
+          currentOutfit = { ...outfit };
+          delete currentOutfit.savedAt;
+          playClickSound();
+          renderDoll();
+          renderWardrobe();
+          triggerDollReaction();
+        };
+        scroll.appendChild(card);
+      });
+    }
+
+    function toggleOutfitGallery() {
+      const gallery = document.getElementById('outfitGallery');
+      gallery.classList.toggle('show');
+      if (gallery.classList.contains('show')) {
+        renderOutfitGallery();
+      }
     }
 
     // ===== NAME INPUT =====

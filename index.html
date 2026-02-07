@@ -2445,12 +2445,140 @@
       }, 8000);
     }
 
+    // ===== SITE WORDS =====
+    const siteWords = {
+      1: ["the", "to", "and", "he", "a", "i", "you", "it", "of", "in", "was", "said", "his", "that", "she", "for", "on", "they", "but", "had"],
+      2: ["at", "him", "with", "up", "all", "look", "is", "her", "there", "some", "out", "as", "be", "have", "go", "we", "am", "then", "little", "down"],
+      3: ["do", "can", "could", "when", "did", "what", "so", "see", "not", "were", "get", "them", "like", "one", "this", "my", "would", "me", "will", "yes"]
+    };
+
+    function generateWordProblem() {
+      const level = Math.min(state.level, 3);
+      const list = siteWords[level] || siteWords[1];
+      const target = list[randInt(0, list.length - 1)];
+      state.correctAnswer = target; // repurpose correctAnswer for the word string
+
+      // Distractors
+      let options = [target];
+      while (options.length < 4) {
+        const w = list[randInt(0, list.length - 1)];
+        if (!options.includes(w)) options.push(w);
+      }
+      // Shuffle
+      options = options.sort(() => Math.random() - 0.5);
+
+      const container = document.getElementById('wordOptions');
+      container.innerHTML = '';
+      options.forEach(word => {
+        const btn = document.createElement('button');
+        btn.className = 'word-btn';
+        btn.textContent = word;
+        btn.onclick = () => checkWordAnswer(word, btn);
+        container.appendChild(btn);
+      });
+
+      // Speak command
+      setTimeout(() => {
+        const prompts = [
+          `Find the word: ${target}`,
+          `Where is: ${target}?`,
+          `Click on: ${target}`,
+          `Can you find: ${target}?`
+        ];
+        const prompt = prompts[randInt(0, prompts.length - 1)];
+        showBubble('gameBubble', `Find: ${target.toUpperCase()}`, 3000);
+        speak(prompt);
+      }, 500);
+    }
+
+    function checkWordAnswer(word, btn) {
+      if (state.waiting) return;
+      state.waiting = true;
+
+      // Reuse existing logic structure but adapted
+      const rect = btn.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top;
+
+      if (word === state.correctAnswer) {
+        // CORRECT
+        btn.classList.add('correct');
+        state.score++; state.streak++; state.questionsCorrect++; state.wrongStreak = 0;
+        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+
+        playCorrectSound();
+        document.getElementById('scoreDisplay').classList.add('pop');
+        setTimeout(() => document.getElementById('scoreDisplay').classList.remove('pop'), 500);
+        starCollectAnim(cx, cy);
+
+        setLabubuState('gameLabubu', 'happy');
+        showFeedback(true);
+        speakRandom('correct');
+
+        // Check level/milestones (reusing existing logic where possible or duplicating needed parts)
+        if (state.questionsCorrect % 5 === 0 && state.questionsCorrect > 0) {
+          document.getElementById('labubuHat').classList.add('show');
+          playMilestoneSound();
+          showBubble('gameBubble', `${state.questionsCorrect} stars! 🌟`, 2500);
+          setTimeout(() => document.getElementById('labubuHat').classList.remove('show'), 3000);
+        }
+
+      } else {
+        // WRONG
+        btn.classList.add('wrong');
+        state.streak = 0; state.wrongStreak++;
+        setLabubuState('gameLabubu', 'sad');
+        showFeedback(false);
+        speak(`The word is ${state.correctAnswer}`);
+      }
+
+      state.questionsAnswered++;
+      updateUI();
+
+      setTimeout(() => {
+        if (state.questionsAnswered >= state.totalQuestions) {
+          showSummary();
+        } else {
+          setLabubuState('gameLabubu', 'idle');
+          hideFeedback();
+          generateWordProblem();
+          state.waiting = false;
+        }
+      }, 2000);
+    }
+
     // ===== GAME START =====
     function startGame(operation) {
+      if (operation === 'words') {
+        state.operation = 'words';
+        state.score = 0; state.streak = 0; state.bestStreak = 0;
+        state.level = 1; state.questionsAnswered = 0; state.questionsCorrect = 0;
+        state.totalQuestions = 10; // Shorter game for words
+        state.waiting = false;
+
+        updateUI();
+        showScreen('gameScreen');
+        document.getElementById('gameScreen').classList.add('word-mode');
+
+        setLabubuState('gameLabubu', 'idle');
+        document.getElementById('labubuHat').classList.remove('show');
+        hideFeedback();
+
+        playGameStartSound();
+        setTimeout(() => {
+          speak("Let's find some words!");
+          generateWordProblem();
+        }, 500);
+        return;
+      }
+
+      // Existing Math Game Start
+      document.getElementById('gameScreen').classList.remove('word-mode');
       state.operation = operation;
       state.score = 0; state.streak = 0; state.bestStreak = 0;
       state.level = 1; state.questionsAnswered = 0; state.questionsCorrect = 0;
       state.currentAnswer = ''; state.wrongStreak = 0; state.waiting = false;
+      state.totalQuestions = 15; // Reset to default
 
       updateUI();
       showScreen('gameScreen');

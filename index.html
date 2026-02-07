@@ -2846,6 +2846,19 @@
     }
 
     function tellJoke() {
+      // Check Energy
+      if (state.jokesAvailable <= 0) {
+        setLabubuState('selectLabubu', 'sad');
+        speak("We need more energy! Play a game to earn more jokes!");
+        showBubble('selectBubble', "Play to earn jokes! 📚", 3000);
+        return;
+      }
+
+      // Deduct Energy
+      state.jokesAvailable--;
+      updateJokeButton();
+      saveGameState();
+
       // Pick random joke
       const joke = jokes[randInt(0, jokes.length - 1)];
 
@@ -3027,7 +3040,9 @@
       correctAnswer: 0, wrongStreak: 0, waiting: false,
       thinkTimer: null,
       unlockedItems: [], equippedItem: null, theme: 'default',
-      collectedStickers: []
+      collectedStickers: [],
+      // Joke Energy
+      jokesAvailable: 3
     };
 
     // ===== PERSISTENCE =====
@@ -3041,7 +3056,8 @@
         unlockedItems: state.unlockedItems || [],
         equippedItem: state.equippedItem || null,
         theme: state.theme || 'default',
-        collectedStickers: state.collectedStickers || []
+        collectedStickers: state.collectedStickers || [],
+        jokesAvailable: state.jokesAvailable
       };
       localStorage.setItem(key, JSON.stringify(data));
     }
@@ -3062,9 +3078,11 @@
           state.equippedItem = data.equippedItem || null;
           state.theme = data.theme || 'default';
           state.collectedStickers = data.collectedStickers || [];
+          state.jokesAvailable = data.jokesAvailable !== undefined ? data.jokesAvailable : 3;
 
           applyTheme(state.theme);
           updateEquippedItem();
+          updateJokeButton();
 
           showBubble('selectBubble', `Welcome back, ${state.playerName}! Level ${state.level} 🌟`, 3000);
 
@@ -3324,6 +3342,21 @@
       document.getElementById('stickerDropOverlay').classList.remove('show');
     }
 
+    function updateJokeButton() {
+      const btn = document.querySelector('.joke-btn');
+      if (!btn) return;
+
+      if (state.jokesAvailable > 0) {
+        btn.innerHTML = `<span class="op-icon">😂</span>Tell me a Joke (${state.jokesAvailable})`;
+        btn.style.opacity = '1';
+        btn.style.filter = 'none';
+      } else {
+        btn.innerHTML = `<span class="op-icon">🚫</span>Play to Earn Jokes`;
+        btn.style.opacity = '0.7';
+        btn.style.filter = 'grayscale(100%)';
+      }
+    }
+
     // ===== UTILS =====
     function randInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -3433,10 +3466,18 @@
         // CORRECT
         btn.classList.add('correct');
         state.score++; state.totalStars++; state.streak++; state.questionsCorrect++; state.wrongStreak = 0;
+        state.score++; state.totalStars++; state.streak++; state.questionsCorrect++; state.wrongStreak = 0;
         if (state.streak > state.bestStreak) state.bestStreak = state.streak;
 
         playCorrectSound();
         document.getElementById('scoreDisplay').classList.add('pop');
+
+        // Recharge Joke Energy
+        if (state.jokesAvailable < 3) {
+          state.jokesAvailable++;
+          updateJokeButton();
+        }
+
         setTimeout(() => document.getElementById('scoreDisplay').classList.remove('pop'), 500);
         starCollectAnim(cx, cy);
 
@@ -3681,6 +3722,13 @@
         // Correct!
         state.score++; state.totalStars++; state.streak++; state.questionsCorrect++;
         if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+
+        // Recharge Joke Energy
+        if (state.jokesAvailable < 3) {
+          state.jokesAvailable++;
+          updateJokeButton();
+          // Optional: visual indicator?
+        }
 
         // Visuals
         const slots = document.querySelectorAll('.letter-slot');

@@ -1919,6 +1919,7 @@
       <button class="op-btn div" onclick="startGame('div')"><span class="op-icon">➗</span>Division</button>
       <button class="op-btn mix-btn" onclick="startGame('mix')"><span class="op-icon">🎲</span>Mix It Up!</button>
       <button class="op-btn words-btn" onclick="startGame('words')"><span class="op-icon">📚</span>Site Words</button>
+      <button class="op-btn spell-btn" onclick="startGame('spelling')"><span class="op-icon">🔤</span>Spelling</button>
     </div>
   </div>
 
@@ -1993,6 +1994,104 @@
     .screen.word-mode .labubu {
       margin-bottom: 20px;
     }
+
+    /* Spelling Mode Styles */
+    .spell-btn {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #A18CD1, #FBC2EB);
+      color: #FFF;
+      font-size: 1.3rem;
+      border: none;
+    }
+
+    .spelling-area {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .word-display {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .letter-slot {
+      width: 50px;
+      height: 60px;
+      border-bottom: 4px solid var(--lavender);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 2.5rem;
+      color: #6A5ACD;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .letter-slot.empty {
+      color: transparent;
+      border-bottom: 4px dashed var(--coral);
+    }
+
+    .letter-slot.filled {
+      color: var(--sky);
+      border-bottom: 4px solid var(--sky);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .letter-slot.correct {
+      color: #2ECC71;
+      border-color: #2ECC71;
+    }
+
+    .letter-slot.wrong {
+      color: var(--coral);
+      border-color: var(--coral);
+    }
+
+    .keyboard {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      max-width: 450px;
+      width: 100%;
+    }
+
+    .key-btn {
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.4rem;
+      padding: 10px 0;
+      border: none;
+      border-radius: 10px;
+      background: white;
+      color: #4A4A6A;
+      text-transform: uppercase;
+      box-shadow: 0 4px 0 #E0E0E0;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .key-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 #E0E0E0;
+    }
+
+    .screen.spell-mode .numpad,
+    .screen.spell-mode .problem-display,
+    .screen.spell-mode .answer-display,
+    .screen.spell-mode .word-options {
+      display: none;
+    }
+
+    .screen.spell-mode .spelling-area {
+      display: flex;
+    }
   </style>
 
   <!-- ==================== GAME ==================== -->
@@ -2059,6 +2158,11 @@
       <button class="numpad-btn submit-btn" onclick="submitAnswer()">Go!</button>
     </div>
     <div class="word-options" id="wordOptions"></div>
+
+    <div class="spelling-area" id="spellingArea">
+      <div class="word-display" id="spellWordDisplay"></div>
+      <div class="keyboard" id="keyboard"></div>
+    </div>
   </div>
 
   <!-- ==================== SUMMARY ==================== -->
@@ -2547,8 +2651,292 @@
       }, 2000);
     }
 
+    // ===== SPELLING =====
+    const spellingWords = {
+      1: ["cat", "dog", "bat", "hat", "pig", "sun", "run", "box", "fox", "map"],
+      2: ["milk", "jump", "play", "ball", "tree", "fish", "frog", "duck", "bird", "star"],
+      3: ["house", "apple", "happy", "train", "grape", "smile", "beach", "mouse", "cloud", "bread"]
+    };
+    let currentSpellWord = "";
+    let currentSpellInput = []; // Array of letters for the current word slots
+    let missingIndices = []; // Indices of letters that need to be filled
+
+    function speakComforting(text) {
+      // Slower rate and slightly lower pitch for comfort
+      speak(text, 0.85, 1.1);
+    }
+
+    function initKeyboard() {
+      const kb = document.getElementById('keyboard');
+      kb.innerHTML = '';
+      const letters = "abcdefghijklmnopqrstuvwxyz".split('');
+      letters.forEach(l => {
+        const btn = document.createElement('button');
+        btn.className = 'key-btn';
+        btn.textContent = l;
+        btn.onclick = () => handleSpellInput(l);
+        kb.appendChild(btn);
+      });
+      // Backspace
+      const back = document.createElement('button');
+      back.className = 'key-btn';
+      back.style.gridColumn = 'span 2';
+      back.style.background = '#FFD1DC';
+      back.textContent = '⌫';
+      back.onclick = () => handleSpellBackspace();
+      kb.appendChild(back);
+    }
+
+    function generateSpellingProblem() {
+      const level = Math.min(state.level, 3);
+      const list = spellingWords[level] || spellingWords[1];
+      currentSpellWord = list[randInt(0, list.length - 1)];
+      state.correctAnswer = currentSpellWord;
+
+      currentSpellInput = currentSpellWord.split('');
+      missingIndices = [];
+
+      // Determine missing letters based on level
+      if (level === 1) {
+        // Hide 1 letter (random)
+        const idx = randInt(0, currentSpellWord.length - 1);
+        missingIndices.push(idx);
+      } else if (level === 2) {
+        // Hide ~50%
+        for (let i = 0; i < currentSpellWord.length; i++) {
+          if (Math.random() > 0.5) missingIndices.push(i);
+        }
+        if (missingIndices.length === 0) missingIndices.push(randInt(0, currentSpellWord.length - 1));
+      } else {
+        // Hide all
+        for (let i = 0; i < currentSpellWord.length; i++) missingIndices.push(i);
+      }
+
+      // Setup Display
+      updateSpellDisplay();
+
+      // Speak
+      setTimeout(() => {
+        showBubble('gameBubble', 'Listen carefully... 👂', 3000);
+        speakComforting(`Spell the word: ${currentSpellWord}`);
+        setTimeout(() => speakComforting(currentSpellWord), 1500);
+      }, 500);
+    }
+
+    function updateSpellDisplay() {
+      const container = document.getElementById('spellWordDisplay');
+      container.innerHTML = '';
+
+      currentSpellWord.split('').forEach((char, i) => {
+        const slot = document.createElement('div');
+        if (missingIndices.includes(i)) {
+          // This is a missing slot
+          // Check if user has filled it (we store user input in a separate array or map)
+          // Simplified: We'll modify currentSpellInput in place? No, let's keep currentSpellInput as the "visual state"
+          // Wait, better approach:
+          // currentSpellWord is target.
+          // We need a way to track what the user has typed into the *missing* slots.
+          // Let's use `currentSpellInput` as an array where missing slots are null initially.
+        }
+      });
+
+      // Actually, let's reset: 
+      // display array holds correct chars for non-missing, and null/user-char for missing.
+    }
+
+    // Better logic for spelling state
+    let spellDisplayState = []; // Array of chars or NULL
+
+    function generateSpellingProblemResolved() { // Renamed to avoid calling the half-baked one above
+      const level = Math.min(state.level, 3);
+      const list = spellingWords[level] || spellingWords[1];
+      currentSpellWord = list[randInt(0, list.length - 1)];
+      state.correctAnswer = currentSpellWord;
+
+      spellDisplayState = currentSpellWord.split('');
+      missingIndices = [];
+
+      if (level === 1) {
+        const idx = randInt(0, currentSpellWord.length - 1);
+        missingIndices.push(idx);
+      } else if (level === 2) {
+        const numToHide = Math.max(1, Math.floor(currentSpellWord.length / 2));
+        while (missingIndices.length < numToHide) {
+          const r = randInt(0, currentSpellWord.length - 1);
+          if (!missingIndices.includes(r)) missingIndices.push(r);
+        }
+      } else {
+        for (let i = 0; i < currentSpellWord.length; i++) missingIndices.push(i);
+      }
+
+      // sort indices to fill in order? No, user fills first empty slot.
+      missingIndices.sort((a, b) => a - b);
+
+      // Clear the missing slots in display state
+      missingIndices.forEach(idx => spellDisplayState[idx] = null);
+
+      renderSpellDisplay();
+
+      setTimeout(() => {
+        showBubble('gameBubble', 'Listen... 👂', 2000);
+        speakComforting(currentSpellWord);
+        setTimeout(() => speakComforting(`Can you spell ${currentSpellWord}?`), 1200);
+      }, 500);
+    }
+
+    function renderSpellDisplay() {
+      const container = document.getElementById('spellWordDisplay');
+      container.innerHTML = '';
+
+      for (let i = 0; i < currentSpellWord.length; i++) {
+        const slot = document.createElement('div');
+        if (missingIndices.includes(i)) {
+          // It's a scalable slot
+          slot.className = 'letter-slot';
+          if (spellDisplayState[i] === null) {
+            slot.classList.add('empty');
+            slot.textContent = '_';
+          } else {
+            slot.classList.add('filled');
+            slot.textContent = spellDisplayState[i];
+          }
+        } else {
+          // It's a static clue letter
+          slot.className = 'letter-slot';
+          slot.style.border = 'none';
+          slot.style.color = '#4A4A6A'; // Static text color
+          slot.textContent = currentSpellWord[i];
+        }
+        container.appendChild(slot);
+      }
+    }
+
+    function handleSpellInput(char) {
+      if (state.waiting) return;
+      playClickSound();
+
+      // Find first null in missing indices
+      // actually first null in spellDisplayState that IS in missingIndices
+      const firstEmptyIndex = missingIndices.find(idx => spellDisplayState[idx] === null);
+
+      if (firstEmptyIndex !== undefined) {
+        spellDisplayState[firstEmptyIndex] = char;
+        renderSpellDisplay();
+
+        // Check if full
+        if (!missingIndices.some(idx => spellDisplayState[idx] === null)) {
+          checkSpelling();
+        }
+      }
+    }
+
+    function handleSpellBackspace() {
+      if (state.waiting) return;
+      playClickSound();
+
+      // Find last filled missing slot
+      // reverse iterate missingIndices
+      for (let i = missingIndices.length - 1; i >= 0; i--) {
+        const idx = missingIndices[i];
+        if (spellDisplayState[idx] !== null) {
+          spellDisplayState[idx] = null;
+          renderSpellDisplay();
+          return;
+        }
+      }
+    }
+
+    function checkSpelling() {
+      state.waiting = true;
+      const userWord = spellDisplayState.join('');
+
+      if (userWord === currentSpellWord) {
+        // Correct!
+        state.score++; state.streak++; state.questionsCorrect++;
+        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+
+        // Visuals
+        const slots = document.querySelectorAll('.letter-slot');
+        slots.forEach(s => s.classList.add('correct'));
+
+        playCorrectSound();
+        speakComforting(`Correct! ${currentSpellWord}.`);
+
+        setLabubuState('gameLabubu', 'happy');
+        starCollectAnim(window.innerWidth / 2, window.innerHeight / 2);
+
+        if (state.questionsCorrect % 5 === 0 && state.questionsCorrect > 0) {
+          showBubble('gameBubble', `${state.questionsCorrect} stars! 🌟`, 2500);
+          playMilestoneSound();
+        }
+
+        // Level up?
+        if (state.streak % 3 === 0 && state.level < 3) {
+          state.level++;
+          showBubble('gameBubble', 'Level Up! ⬆️', 2000);
+        }
+
+      } else {
+        // Wrong
+        state.streak = 0;
+        const slots = document.querySelectorAll('.letter-slot');
+        slots.forEach(s => s.classList.add('wrong'));
+
+        playWrongSound();
+        setLabubuState('gameLabubu', 'sad');
+        speakComforting(`oops, that spells ${userWord}. Try again!`);
+
+        setTimeout(() => {
+          // Reset ONLY the missing slots
+          missingIndices.forEach(idx => spellDisplayState[idx] = null);
+          renderSpellDisplay();
+          state.waiting = false;
+          setLabubuState('gameLabubu', 'idle');
+        }, 2000);
+        return; // Don't generate new problem yet
+      }
+
+      state.questionsAnswered++;
+      updateUI();
+
+      setTimeout(() => {
+        if (state.questionsAnswered >= state.totalQuestions) {
+          showSummary();
+        } else {
+          setLabubuState('gameLabubu', 'idle');
+          generateSpellingProblemResolved();
+          state.waiting = false;
+        }
+      }, 2500);
+    }
+
+
     // ===== GAME START =====
     function startGame(operation) {
+      if (operation === 'spelling') {
+        state.operation = 'spelling';
+        state.score = 0; state.streak = 0;
+        state.level = 1; state.questionsAnswered = 0; state.questionsCorrect = 0;
+        state.totalQuestions = 8;
+        state.waiting = false;
+
+        updateUI();
+        showScreen('gameScreen');
+        document.getElementById('gameScreen').className = 'screen active spell-mode';
+
+        setLabubuState('gameLabubu', 'idle');
+        document.getElementById('labubuHat').classList.remove('show');
+        hideFeedback();
+
+        initKeyboard();
+        playGameStartSound();
+        setTimeout(() => {
+          speakComforting("Let's spell together!");
+          generateSpellingProblemResolved();
+        }, 500);
+        return;
+      }
+
       if (operation === 'words') {
         state.operation = 'words';
         state.score = 0; state.streak = 0; state.bestStreak = 0;
@@ -2558,7 +2946,7 @@
 
         updateUI();
         showScreen('gameScreen');
-        document.getElementById('gameScreen').classList.add('word-mode');
+        document.getElementById('gameScreen').className = 'screen active word-mode';
 
         setLabubuState('gameLabubu', 'idle');
         document.getElementById('labubuHat').classList.remove('show');
@@ -2573,12 +2961,12 @@
       }
 
       // Existing Math Game Start
-      document.getElementById('gameScreen').classList.remove('word-mode');
+      document.getElementById('gameScreen').className = 'screen active';
       state.operation = operation;
       state.score = 0; state.streak = 0; state.bestStreak = 0;
       state.level = 1; state.questionsAnswered = 0; state.questionsCorrect = 0;
       state.currentAnswer = ''; state.wrongStreak = 0; state.waiting = false;
-      state.totalQuestions = 15; // Reset to default
+      state.totalQuestions = 15;
 
       updateUI();
       showScreen('gameScreen');

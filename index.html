@@ -2291,6 +2291,43 @@
     </div>
   </div>
 
+  <!-- US HISTORY OVERLAY -->
+  <div class="level-up-overlay" id="historyOverlay">
+    <div class="level-up-box shop-box"
+      style="background: linear-gradient(135deg, #E3F2FD, #BBDEFB); border: 5px solid #1565C0;">
+      <div class="shop-header" style="background: linear-gradient(135deg, #1565C0, #0D47A1); color: white;">
+        <h2>History Time Machine 🇺🇸🕰️</h2>
+        <button class="close-shop-btn" onclick="closeHistory()">✖</button>
+      </div>
+
+      <div
+        style="flex-grow:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
+
+        <div id="timeMachineDisplay" style="margin-bottom: 20px;">
+          <div style="font-size: 5rem; animation: float 3s infinite ease-in-out;">🕰️</div>
+        </div>
+
+        <div id="historyFactCard"
+          style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); max-width: 500px; margin-bottom: 20px; display: none;">
+          <div id="factEmoji" style="font-size: 3rem; margin-bottom: 10px;">🇺🇸</div>
+          <p id="factText"
+            style="font-size: 1.5rem; color: #333; line-height: 1.6; font-family: 'Comic Neue', cursive;">
+            Press the button to travel through time!
+          </p>
+          <button class="op-btn" style="margin-top:15px; font-size:1rem; padding: 8px 16px; background: #66BB6A;"
+            onclick="readFact()">🔊 Listen</button>
+        </div>
+
+        <button class="op-btn"
+          style="background: linear-gradient(135deg, #D32F2F, #C62828); color: white; font-size: 1.5rem; padding: 15px 30px;"
+          onclick="spinTimeMachine()">
+          🕐 Travel Through Time! 🌀
+        </button>
+
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== WELCOME ==================== -->
   <div class="screen active" id="welcomeScreen">
     <div class="labubu idle wave" id="welcomeLabubu">
@@ -2372,9 +2409,10 @@
       <button class="op-btn"
         style="grid-column: 1/-1; background: linear-gradient(135deg, #FF9800, #F57C00); color: white;"
         onclick="openLeaderboard()"><span class="op-icon">🏆</span>Hall of Fame</button>
-      <button class="op-btn"
-        style="grid-column: 1/-1; background: linear-gradient(135deg, #BA68C8, #8E24AA); color: white;"
+      <button class="op-btn" style="background: linear-gradient(135deg, #BA68C8, #8E24AA); color: white;"
         onclick="openStorybook()"><span class="op-icon">📚</span>Storybook</button>
+      <button class="op-btn" style="background: linear-gradient(135deg, #1565C0, #0D47A1); color: white;"
+        onclick="openHistory()"><span class="op-icon">🇺🇸</span>History</button>
     </div>
   </div>
 
@@ -3653,6 +3691,83 @@
     function resetReader() {
       document.getElementById('storyReader').style.display = 'none';
       document.getElementById('storyLibrary').style.display = 'grid';
+    }
+
+    // ===== US HISTORY LOGIC =====
+    const historyFacts = [
+      { emoji: '🇺🇸', text: "The American flag has 50 stars! One for each state." },
+      { emoji: '🍦', text: "George Washington, our first president, loved ice cream!" },
+      { emoji: '🦅', text: "The Bald Eagle is the symbol of the United States because it is strong and free." },
+      { emoji: '🗽', text: "The Statue of Liberty was a gift from France. She wears size 879 sandals!" },
+      { emoji: '🔔', text: "The Liberty Bell in Philadelphia has a big crack in it!" },
+      { emoji: '🌙', text: "Neil Armstrong was the first person to walk on the Moon. He was American!" },
+      { emoji: '🥜', text: "George Washington Carver invented over 300 uses for peanuts!" },
+      { emoji: '💡', text: "Thomas Edison invented the light bulb so we can see in the dark." },
+      { emoji: '🏠', text: "The White House is where the President lives. It has 132 rooms!" },
+      { emoji: '🦕', text: "Thomas Jefferson loved dinosaur bones and had some in the White House!" },
+      { emoji: '🦃', text: "Benjamin Franklin wanted the Turkey to be our national bird, not the Eagle!" },
+      { emoji: '🪙', text: "Abraham Lincoln is on the penny. He was very tall and wore a big hat!" },
+      { emoji: '✈️', text: "The Wright Brothers flew the first airplane in 1903." },
+      { emoji: '🐻', text: "The Teddy Bear is named after President Theodore 'Teddy' Roosevelt." },
+      { emoji: '🌉', text: "The Golden Gate Bridge in San Francisco is actually painted 'International Orange'!" }
+    ];
+
+    function openHistory() {
+      document.getElementById('historyOverlay').classList.add('show');
+      document.getElementById('historyFactCard').style.display = 'none';
+      document.getElementById('timeMachineDisplay').innerHTML = '<div style="font-size: 5rem; animation: float 3s infinite ease-in-out;">🕰️</div>';
+    }
+
+    function closeHistory() {
+      document.getElementById('historyOverlay').classList.remove('show');
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+
+    function spinTimeMachine() {
+      // Animation effect
+      const display = document.getElementById('timeMachineDisplay');
+      display.innerHTML = '<div style="font-size: 5rem; animation: spin 0.5s infinite linear;">🌀</div>';
+
+      // Play sound?
+      playClickSound();
+
+      setTimeout(() => {
+        const fact = historyFacts[randInt(0, historyFacts.length - 1)];
+        display.innerHTML = ''; // Hide spinner
+
+        const card = document.getElementById('historyFactCard');
+        card.style.display = 'block';
+        card.classList.add('pop'); // Reuse pop animation
+
+        document.getElementById('factEmoji').textContent = fact.emoji;
+        document.getElementById('factText').textContent = fact.text;
+
+        // Auto read? Maybe just play sound
+        playMilestoneSound();
+
+        setTimeout(() => card.classList.remove('pop'), 500);
+
+      }, 1500);
+    }
+
+    function readFact() {
+      const text = document.getElementById('factText').textContent;
+      const u = new SpeechSynthesisUtterance(text);
+
+      // Labubu voice settings
+      u.pitch = 1.6;
+      u.rate = 1.0;
+
+      // Try to match storybook voice
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(v => v.name === 'Google US English') ||
+        voices.find(v => v.name === 'Samantha') ||
+        voices.find(v => v.name.includes('Female')) ||
+        voices[0];
+      if (preferredVoice) u.voice = preferredVoice;
+
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
     }
 
     function updateJokeButton() {

@@ -3482,10 +3482,10 @@
     // ===== VOICE =====
     const voiceLines = {
       correct: [
-        "Amazing!", "Great job!", "You got it!", "Wonderful!",
-        "That's right!", "Yay!", "Perfect!", "Super smart!",
-        "You're awesome!", "Fantastic!", "Way to go!", "Brilliant!",
-        "Math whiz!", "Genius!", "So cool!"
+        "Amazing, {name}!", "Great job, {name}!", "You got it, {name}!", "Wonderful, {name}!",
+        "That's right, {name}!", "Yay, {name}!", "Perfect, {name}!", "Super smart, {name}!",
+        "You're awesome, {name}!", "Fantastic, {name}!", "Way to go, {name}!", "Brilliant, {name}!",
+        "{name} is a math whiz!", "{name} is a genius!", "So cool, {name}!"
       ],
       wrong: [
         "Oops! Let's try the next one!", "Don't worry, you'll get it!",
@@ -3494,61 +3494,61 @@
         "So close! You can do it!", "Good effort! Try the next one!"
       ],
       streak3: [
-        "Three in a row! You're on fire!",
-        "Hat trick! Amazing!",
-        "Triple combo! Keep it up!",
-        "Three stars! Woo hoo!"
+        "Three in a row, {name}! You're on fire!",
+        "Hat trick, {name}! Amazing!",
+        "Triple combo, {name}! Keep it up!",
+        "Three stars for {name}! Woo hoo!"
       ],
       streak5: [
-        "Five in a row! Unstoppable!",
-        "Mega streak! You're a math wizard!",
-        "High five! Five correct!",
-        "Superstar mode activated!"
+        "Five in a row, {name}! Unstoppable!",
+        "Mega streak! {name} is a math wizard!",
+        "High five, {name}! Five correct!",
+        "{name}'s superstar mode activated!"
       ],
       streak10: [
-        "Ten in a row! Incredible!",
-        "Legendary streak! You're a superstar!",
-        "Ten combo! Nothing can stop you!",
-        "Math champion! Ten in a row!"
+        "Ten in a row! {name} is incredible!",
+        "Legendary streak! {name} is a superstar!",
+        "Ten combo! Nothing can stop {name}!",
+        "Math champion {name}! Ten in a row!"
       ],
       milestone5: [
-        "Five stars! Labubu is so proud!",
-        "Five stars earned! You're glowing!",
-        "Wow, five stars! Keep shining!"
+        "Five stars, {name}! Labubu is so proud!",
+        "Five stars earned! {name} is glowing!",
+        "Wow, five stars! Keep shining, {name}!"
       ],
       milestone10: [
-        "Level up! You're a math champion!",
-        "Ten stars! Labubu is doing a happy dance!",
-        "Superstar! Ten stars and counting!"
+        "Level up! {name} is a math champion!",
+        "Ten stars! Labubu is doing a happy dance for {name}!",
+        "Superstar {name}! Ten stars and counting!"
       ],
       gameStart: [
-        "Let's do this!", "Math time! Let's go!",
-        "Ready? Here we go!", "Labubu believes in you!",
-        "You've got this!", "Adventure time!"
+        "Let's do this, {name}!", "Math time, {name}! Let's go!",
+        "Ready, {name}? Here we go!", "Labubu believes in you, {name}!",
+        "{name}, you've got this!", "Adventure time, {name}!"
       ],
       gameEnd90: [
-        "Wow! You're a math superstar! Labubu is so proud!",
-        "Incredible score! You're amazing!",
-        "Absolutely perfect! You're the best!"
+        "Wow! {name} is a math superstar! Labubu is so proud!",
+        "Incredible score, {name}! You're amazing!",
+        "Absolutely perfect! {name} is the best!"
       ],
       gameEnd70: [
-        "Great job! You did really well!",
-        "Awesome work! Keep practicing!",
-        "Really good! Labubu is happy!"
+        "Great job, {name}! You did really well!",
+        "Awesome work, {name}! Keep practicing!",
+        "Really good, {name}! Labubu is happy!"
       ],
       gameEnd50: [
-        "Nice effort! You're getting better!",
-        "Good try! Practice makes perfect!",
-        "You're learning fast!"
+        "Nice effort, {name}! You're getting better!",
+        "Good try, {name}! Practice makes perfect!",
+        "{name} is learning fast!"
       ],
       gameEndLow: [
-        "Don't give up! Labubu believes in you!",
-        "You're learning! Let's play again!",
-        "Every try makes you stronger!"
+        "Don't give up, {name}! Labubu believes in you!",
+        "{name} is learning! Let's play again!",
+        "Every try makes {name} stronger!"
       ],
       thinking: [
-        "Hmm, take your time!", "Think carefully!",
-        "You can figure it out!", "No rush!"
+        "Hmm, take your time, {name}!", "Think carefully, {name}!",
+        "You can figure it out, {name}!", "No rush, {name}!"
       ]
     };
 
@@ -3628,7 +3628,10 @@
 
     function speakRandom(category) {
       const lines = voiceLines[category];
-      if (lines) speak(lines[randInt(0, lines.length - 1)]);
+      if (lines) {
+        const line = lines[randInt(0, lines.length - 1)].replace(/\{name\}/g, state.playerName || 'Friend');
+        speak(line);
+      }
     }
 
     function tellJoke() {
@@ -4831,7 +4834,7 @@
         slots.forEach(s => s.classList.add('correct'));
 
         playCorrectSound();
-        speakComforting(`Correct! ${currentSpellWord}.`);
+        speakComforting(`Correct, ${state.playerName || 'Friend'}! ${currentSpellWord}.`);
 
         setLabubuState('gameLabubu', 'happy');
         starCollectAnim(window.innerWidth / 2, window.innerHeight / 2);
@@ -5140,13 +5143,13 @@
     }
 
     const correctMessages = [
-      "Amazing! ⭐", "Awesome! 🌟", "You're a star! ✨", "Fantastic! 💫",
-      "Super! 🎉", "Brilliant! 🧠", "Wow! 🤩", "Math genius! 🎓",
-      "Incredible! 💪", "Keep going! 🚀", "Nailed it! 🎯", "Perfect! 💯"
+      "Amazing, {name}! ⭐", "Awesome, {name}! 🌟", "{name} is a star! ✨", "Fantastic, {name}! 💫",
+      "Super, {name}! 🎉", "Brilliant, {name}! 🧠", "Wow, {name}! 🤩", "{name} the genius! 🎓",
+      "Incredible, {name}! 💪", "Keep going, {name}! 🚀", "{name} nailed it! 🎯", "Perfect, {name}! 💯"
     ];
     const correctMessagesSuper = [
-      "UNSTOPPABLE! 🔥", "LEGENDARY! 👑", "MEGA COMBO! ⚡",
-      "SUPERSTAR! 🌟", "ON FIRE! 💥"
+      "{name} is UNSTOPPABLE! 🔥", "LEGENDARY, {name}! 👑", "MEGA COMBO, {name}! ⚡",
+      "{name} the SUPERSTAR! 🌟", "{name} is ON FIRE! 💥"
     ];
     const wrongMessages = [
       "Almost! The answer was {a} 💪",
@@ -5157,9 +5160,10 @@
 
     function showFeedback(isCorrect, isSuper = false) {
       const el = document.getElementById('feedback');
+      const name = state.playerName || 'Friend';
       if (isCorrect) {
         const msgs = isSuper ? correctMessagesSuper : correctMessages;
-        el.textContent = msgs[randInt(0, msgs.length - 1)];
+        el.textContent = msgs[randInt(0, msgs.length - 1)].replace(/\{name\}/g, name);
         el.className = 'feedback show correct-msg';
       } else {
         el.textContent = wrongMessages[randInt(0, wrongMessages.length - 1)]

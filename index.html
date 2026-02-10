@@ -4590,9 +4590,36 @@
 
     // ===== SPELLING =====
     const spellingWords = {
-      1: ["cat", "dog", "bat", "hat", "pig", "sun", "run", "box", "fox", "map"],
-      2: ["milk", "jump", "play", "ball", "tree", "fish", "frog", "duck", "bird", "star"],
-      3: ["house", "apple", "happy", "train", "grape", "smile", "beach", "mouse", "cloud", "bread"]
+      1: [
+        "cat", "dog", "bat", "hat", "pig", "sun", "run", "box", "fox", "map",
+        "bed", "red", "hen", "pen", "ten", "cup", "bug", "rug", "mud", "bus",
+        "ant", "jam", "van", "fan", "pan", "can", "man", "ran", "sat", "mat",
+        "top", "hop", "mop", "pop", "pot", "hot", "got", "dot", "lot", "log",
+        "net", "jet", "wet", "pet", "set", "leg", "beg", "dig", "big", "wig",
+        "zip", "lip", "tip", "hip", "dip", "fin", "win", "bin", "pin", "tin",
+        "cow", "bow", "row", "tow", "low", "new", "dew", "few", "hug", "jug",
+        "dad", "mom", "egg", "add", "odd", "bee", "see", "zoo", "moo", "boo"
+      ],
+      2: [
+        "milk", "jump", "play", "ball", "tree", "fish", "frog", "duck", "bird", "star",
+        "cake", "bike", "kite", "rice", "home", "bone", "nose", "rope", "name", "game",
+        "king", "ring", "sing", "wing", "lamp", "camp", "hand", "band", "sand", "land",
+        "dish", "wish", "ship", "chip", "shop", "chop", "drop", "stop", "snap", "clap",
+        "rain", "tail", "sail", "mail", "wait", "goat", "boat", "coat", "road", "toad",
+        "corn", "horn", "barn", "farm", "park", "dark", "bark", "cart", "part", "yard",
+        "desk", "belt", "help", "nest", "best", "rest", "test", "west", "fast", "last",
+        "drum", "swim", "crab", "flag", "plan", "flat", "glad", "grab", "trap", "trip"
+      ],
+      3: [
+        "house", "apple", "happy", "train", "grape", "smile", "beach", "mouse", "cloud", "bread",
+        "plant", "dance", "dream", "heart", "earth", "light", "night", "fight", "right", "sight",
+        "water", "paper", "tiger", "river", "never", "under", "after", "super", "table", "cable",
+        "green", "queen", "sweet", "sleep", "sheep", "wheel", "teeth", "speed", "steel", "creek",
+        "stone", "phone", "store", "score", "brave", "plane", "snake", "space", "trace", "place",
+        "candy", "penny", "bunny", "funny", "sunny", "puppy", "foggy", "dusty", "windy", "rainy",
+        "month", "tooth", "youth", "south", "round", "sound", "found", "ground", "brown", "crown",
+        "shirt", "skirt", "third", "first", "think", "thank", "fresh", "brush", "crash", "block"
+      ]
     };
     let currentSpellWord = "";
     let currentSpellInput = []; // Array of letters for the current word slots

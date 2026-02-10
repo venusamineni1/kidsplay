@@ -4834,7 +4834,7 @@
         slots.forEach(s => s.classList.add('correct'));
 
         playCorrectSound();
-        speakComforting(`Correct, ${state.playerName || 'Friend'}! ${currentSpellWord}.`);
+        speakComforting(`Correct, ${state.playerName || 'Friend'}!`);
 
         setLabubuState('gameLabubu', 'happy');
         starCollectAnim(window.innerWidth / 2, window.innerHeight / 2);

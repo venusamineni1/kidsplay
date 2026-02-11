@@ -2840,15 +2840,24 @@
           style="padding: 10px; background: #F3E5F5; display: flex; justify-content: space-between; align-items: center;">
           <button class="key-btn" style="padding: 5px 15px; font-size: 1rem;" onclick="backToLibrary()">⬅ Back</button>
           <h3 id="readerTitle" style="margin: 0; color: #4A148C;">Title</h3>
-          <div>
+          <div style="display: flex; gap: 8px;">
             <button class="key-btn"
               style="background:#4CAF50; border-color:#388E3C; padding: 5px 15px; font-size: 1rem;"
               onclick="toggleReadAloud()" id="readAloudBtn">🔊 Read</button>
+            <button class="key-btn" id="quizBtn"
+              style="background:#8E24AA; border-color:#6A1B9A; padding: 5px 15px; font-size: 1rem; color: white; display: none;"
+              onclick="startStoryQuiz()">🧠 Quiz</button>
           </div>
         </div>
         <div id="readerContent"
           style="flex-grow: 1; padding: 20px; overflow-y: auto; font-size: 1.3rem; line-height: 1.8; color: #333; font-family: 'Comic Neue', cursive; white-space: pre-wrap;">
           <!-- Story Text -->
+        </div>
+        <div id="quizArea" style="display: none; flex-grow: 1; padding: 20px; overflow-y: auto; text-align: center;">
+          <h3 style="color: #8E24AA; margin-bottom: 15px; font-size: 1.4rem;" id="quizQuestion">Question?</h3>
+          <div id="quizOptions" class="quiz-options"></div>
+          <div id="quizFeedback" style="margin: 15px 0; font-size: 1.2rem; min-height: 30px;">&nbsp;</div>
+          <div id="quizProgress" style="font-size: 0.9rem; color: #888;"></div>
         </div>
       </div>
     </div>
@@ -3040,6 +3049,7 @@
       <button class="op-btn mix-btn" onclick="startGame('mix')"><span class="op-icon">🎲</span>Mix It Up!</button>
       <button class="op-btn words-btn" onclick="startGame('words')"><span class="op-icon">📚</span>Site Words</button>
       <button class="op-btn spell-btn" onclick="startGame('spelling')"><span class="op-icon">🔤</span>Spelling</button>
+      <button class="op-btn phonics-btn" onclick="startGame('phonics')"><span class="op-icon">🎵</span>Phonics</button>
       <button class="op-btn joke-btn" onclick="tellJoke()"><span class="op-icon">😂</span>Tell me a Joke</button>
       <button class="op-btn" style="background: linear-gradient(135deg, #FFD54F, #FFCA28); color: #fff;"
         onclick="openShop()"><span class="op-icon">🏪</span>Shop</button>
@@ -3058,6 +3068,119 @@
   </div>
 
   <style>
+    /* Quiz Styles */
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .quiz-option-btn {
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.2rem;
+      padding: 12px 20px;
+      border: 3px solid #E1BEE7;
+      border-radius: 15px;
+      background: white;
+      color: #4A4A6A;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quiz-option-btn:hover {
+      transform: translateY(-2px);
+      border-color: #8E24AA;
+      box-shadow: 0 4px 12px rgba(142, 36, 170, 0.2);
+    }
+
+    .quiz-option-btn.correct {
+      background: #69F0AE;
+      border-color: #2ECC71;
+      color: white;
+      animation: correctPop 0.4s ease;
+    }
+
+    .quiz-option-btn.wrong {
+      background: #FF5252;
+      border-color: #D32F2F;
+      color: white;
+    }
+
+    /* Hint Button Styles */
+    .hint-btn {
+      font-family: 'Bubblegum Sans', cursive;
+      font-size: 1.1rem;
+      padding: 8px 20px;
+      border: 2px solid #FFD54F;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #FFF9C4, #FFE082);
+      color: #F57F17;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin: 5px auto;
+      display: block;
+    }
+
+    .hint-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    }
+
+    .hint-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Phonics Styles */
+    .phonics-btn {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #81D4FA, #4FC3F7);
+      color: #01579B;
+      font-size: 1.3rem;
+      border: none;
+    }
+
+    .screen.phonics-mode .numpad,
+    .screen.phonics-mode .problem-display,
+    .screen.phonics-mode .answer-display,
+    .screen.phonics-mode .spelling-area {
+      display: none;
+    }
+
+    .screen.phonics-mode .word-options {
+      display: grid;
+    }
+
+    .screen.phonics-mode .read-btn {
+      display: block;
+    }
+
+    .phonics-prompt {
+      font-size: 1.3rem;
+      color: #4A4A6A;
+      text-align: center;
+      margin: 5px 0;
+      display: none;
+    }
+
+    .phonics-target {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #01579B;
+      text-align: center;
+      margin: 5px 0;
+      display: none;
+    }
+
+    .screen.phonics-mode .phonics-prompt,
+    .screen.phonics-mode .phonics-target {
+      display: block;
+    }
+
     /* New styles for Word Game */
     .words-btn {
       grid-column: 1 / -1;
@@ -3313,6 +3436,9 @@
     <div class="problem-display" id="problemDisplay">...</div>
     <div class="answer-display" id="answerDisplay">&nbsp;</div>
     <div class="feedback" id="feedback">&nbsp;</div>
+    <button class="hint-btn" id="hintBtn" onclick="useHint()">💡 Hint (2)</button>
+    <div class="phonics-prompt" id="phonicsPrompt"></div>
+    <div class="phonics-target" id="phonicsTarget"></div>
 
     <div class="numpad">
       <button class="numpad-btn" onclick="numPress(1)">1</button>
@@ -3602,7 +3728,37 @@
       { q: "What kind of shoes do ninjas wear?", a: "Sneakers!" },
       { q: "Why are ghosts bad at lying?", a: "Because you can see right through them!" },
       { q: "What do you call a funny mountain?", a: "Hill-arious!" },
-      { q: "Why was the broom late?", a: "It over-swept!" }
+      { q: "Why was the broom late?", a: "It over-swept!" },
+      { q: "What do you call an alligator in a vest?", a: "An investigator!" },
+      { q: "Why do ducks have tail feathers?", a: "To cover their butt quacks!" },
+      { q: "What do you call a dinosaur that crashes their car?", a: "Tyrannosaurus Wrecks!" },
+      { q: "What do you call a sleeping bull?", a: "A bulldozer!" },
+      { q: "Why do seagulls fly over the sea?", a: "Because if they flew over the bay, they'd be bagels!" },
+      { q: "What do you call a dog that does magic tricks?", a: "A Labracadabrador!" },
+      { q: "Why did the teddy bear say no to dessert?", a: "Because she was stuffed!" },
+      { q: "What do you give a sick lemon?", a: "Lemon aid!" },
+      { q: "What did the ocean say to the sand?", a: "Nothing, it just waved!" },
+      { q: "Why do elephants never use computers?", a: "Because they're afraid of the mouse!" },
+      { q: "What do you call a monkey at the North Pole?", a: "Very lost!" },
+      { q: "What kind of music do planets like?", a: "Nep-tunes!" },
+      { q: "Why was the baby strawberry crying?", a: "Because its parents were in a jam!" },
+      { q: "What did the left eye say to the right eye?", a: "Between us, something smells!" },
+      { q: "How does a penguin build its house?", a: "Igloos it together!" },
+      { q: "What do you call a train that sneezes?", a: "Achoo-choo train!" },
+      { q: "Why did the bicycle fall over?", a: "Because it was two tired!" },
+      { q: "What do clouds wear under their shorts?", a: "Thunderwear!" },
+      { q: "What animal is always at a baseball game?", a: "A bat!" },
+      { q: "Why do we tell actors to break a leg?", a: "Because every play has a cast!" },
+      { q: "What does a cloud wear under his raincoat?", a: "Thunderwear!" },
+      { q: "What do you call a boomerang that won't come back?", a: "A stick!" },
+      { q: "Why couldn't the bicycle stand up by itself?", a: "It was two tired!" },
+      { q: "What do you call a rabbit with fleas?", a: "Bugs Bunny!" },
+      { q: "Why did the tomato turn red?", a: "Because it saw the salad dressing!" },
+      { q: "What has four wheels and flies?", a: "A garbage truck!" },
+      { q: "Why did the turtle cross the road?", a: "To get to the Shell station!" },
+      { q: "What do you call a fairy that hasn't taken a bath?", a: "Stinkerbell!" },
+      { q: "What do snowmen eat for breakfast?", a: "Frosted Flakes!" },
+      { q: "Why is Peter Pan always flying?", a: "Because he Neverlands!" }
     ];
 
     let speechEnabled = true;
@@ -3824,14 +3980,15 @@
       streak: 0, bestStreak: 0, level: 1,
       questionsAnswered: 0, questionsCorrect: 0,
       totalQuestions: 15, currentAnswer: '',
-      questionsAnswered: 0, questionsCorrect: 0,
-      totalQuestions: 15, currentAnswer: '',
       correctAnswer: 0, wrongStreak: 0, waiting: false,
       thinkTimer: null,
       unlockedItems: [], equippedItem: null, theme: 'default',
       collectedStickers: [],
       // Joke Energy
-      jokesAvailable: 3
+      jokesAvailable: 3,
+      // Hints
+      hintsUsed: 0,
+      hintsPerQuestion: 2
     };
 
     // ===== PERSISTENCE =====
@@ -4204,23 +4361,93 @@
     const stories = [
       {
         id: 'tortoise', title: 'The Tortoise and the Hare', emoji: '🐢',
-        text: "Once upon a time, a Hare made fun of a Tortoise for being slow.\n\n\"I am the fastest runner in the woods!\" bragged the Hare.\n\n\"Let's race,\" said the Tortoise calmly.\n\nThe Hare ran fast and left the Tortoise far behind. He was so sure he would win that he took a nap under a tree.\n\nBut the Tortoise kept walking. Slowly but surely, he passed the sleeping Hare.\n\nWhen the Hare woke up, the Tortoise was already at the finish line!\n\nThe moral is: Slow and steady wins the race."
+        text: "Once upon a time, a Hare made fun of a Tortoise for being slow.\n\n\"I am the fastest runner in the woods!\" bragged the Hare.\n\n\"Let's race,\" said the Tortoise calmly.\n\nThe Hare ran fast and left the Tortoise far behind. He was so sure he would win that he took a nap under a tree.\n\nBut the Tortoise kept walking. Slowly but surely, he passed the sleeping Hare.\n\nWhen the Hare woke up, the Tortoise was already at the finish line!\n\nThe moral is: Slow and steady wins the race.",
+        questions: [
+          { q: "Who bragged about being the fastest?", options: ["The Hare", "The Tortoise", "The Fox"], answer: 0 },
+          { q: "What did the Hare do during the race?", options: ["Took a nap", "Kept running", "Turned around"], answer: 0 },
+          { q: "What is the moral of the story?", options: ["Slow and steady wins the race", "Always run fast", "Never race anyone"], answer: 0 }
+        ]
       },
       {
         id: 'lion', title: 'The Lion and the Mouse', emoji: '🦁',
-        text: "A Lion was sleeping when a little Mouse ran over his nose. The Lion woke up and grabbed the Mouse.\n\n\"Please let me go!\" squeaked the Mouse. \"Maybe one day I can help you.\"\n\nThe Lion laughed. \"You are too small to help me!\" But he let the Mouse go.\n\nLater, the Lion got caught in a hunter's net. He roared for help.\n\nThe little Mouse heard him. He ran to the net and chewed the ropes until they broke. The Lion was free!\n\n\"Thank you,\" said the Lion. \"Even little friends can be big helpers.\""
+        text: "A Lion was sleeping when a little Mouse ran over his nose. The Lion woke up and grabbed the Mouse.\n\n\"Please let me go!\" squeaked the Mouse. \"Maybe one day I can help you.\"\n\nThe Lion laughed. \"You are too small to help me!\" But he let the Mouse go.\n\nLater, the Lion got caught in a hunter's net. He roared for help.\n\nThe little Mouse heard him. He ran to the net and chewed the ropes until they broke. The Lion was free!\n\n\"Thank you,\" said the Lion. \"Even little friends can be big helpers.\"",
+        questions: [
+          { q: "What woke the Lion up?", options: ["A Mouse ran over his nose", "A loud noise", "The rain"], answer: 0 },
+          { q: "How did the Mouse save the Lion?", options: ["Chewed the ropes", "Scared the hunter", "Called for help"], answer: 0 },
+          { q: "What did the Lion learn?", options: ["Even little friends can be big helpers", "Mice are dangerous", "Never sleep outside"], answer: 0 }
+        ]
       },
       {
         id: 'pigs', title: 'The Three Little Pigs', emoji: '🐷',
-        text: "Three little pigs built houses. The first pig built a house of straw. The second pig built a house of sticks. The third pig built a house of bricks.\n\nA Big Bad Wolf came to the straw house. \"I will huff and puff and blow your house down!\" And he did.\n\nHe came to the stick house. \"I will huff and puff and blow your house down!\" And he did that too.\n\nHe came to the brick house. He huffed and puffed, but the house did not fall!\n\nThe wolf gave up and ran away. The three little pigs lived happily ever after."
+        text: "Three little pigs built houses. The first pig built a house of straw. The second pig built a house of sticks. The third pig built a house of bricks.\n\nA Big Bad Wolf came to the straw house. \"I will huff and puff and blow your house down!\" And he did.\n\nHe came to the stick house. \"I will huff and puff and blow your house down!\" And he did that too.\n\nHe came to the brick house. He huffed and puffed, but the house did not fall!\n\nThe wolf gave up and ran away. The three little pigs lived happily ever after.",
+        questions: [
+          { q: "What was the strongest house made of?", options: ["Bricks", "Straw", "Sticks"], answer: 0 },
+          { q: "What did the wolf do to the straw house?", options: ["Blew it down", "Burned it", "Knocked on the door"], answer: 0 },
+          { q: "What happened to the wolf at the brick house?", options: ["He gave up and ran away", "He blew it down", "He went inside"], answer: 0 }
+        ]
       },
       {
         id: 'duck', title: 'The Ugly Duckling', emoji: '🦆',
-        text: "A mother duck had five little eggs. Four hatched into cute yellow ducklings. The last egg was big. Out came a gray, clumsy bird.\n\n\"You are not like us,\" said the others. They called him the Ugly Duckling.\n\nHe felt sad and lonely. He walked away to find a friend.\n\nWinter came, and he grew bigger. When Spring arrived, he looked in the water. He was not an ugly duckling anymore.\n\nHe was a beautiful white Swan! He flew into the sky, happy at last."
+        text: "A mother duck had five little eggs. Four hatched into cute yellow ducklings. The last egg was big. Out came a gray, clumsy bird.\n\n\"You are not like us,\" said the others. They called him the Ugly Duckling.\n\nHe felt sad and lonely. He walked away to find a friend.\n\nWinter came, and he grew bigger. When Spring arrived, he looked in the water. He was not an ugly duckling anymore.\n\nHe was a beautiful white Swan! He flew into the sky, happy at last.",
+        questions: [
+          { q: "How many eggs did the mother duck have?", options: ["Five", "Three", "Ten"], answer: 0 },
+          { q: "Why was the duckling called ugly?", options: ["He looked different from the others", "He was mean", "He was too loud"], answer: 0 },
+          { q: "What did the ugly duckling become?", options: ["A beautiful Swan", "A big duck", "A baby eagle"], answer: 0 }
+        ]
       },
       {
         id: 'emperor', title: 'The Emperor\'s New Clothes', emoji: '👑',
-        text: "An Emperor loved new clothes. Two weavers said they could make magic cloth. \"It is invisible to foolish people,\" they said.\n\nThe Emperor paid them lots of gold. They pretended to weave, but there was no cloth!\n\nThe Emperor put on the \"magic\" clothes. He could not see them, but he did not want to look foolish. So he walked in a parade wearing nothing at all!\n\nEveryone cheered until a little boy shouted, \"The Emperor has no clothes!\"\n\nEveryone laughed. The Emperor learned a lesson about being honest."
+        text: "An Emperor loved new clothes. Two weavers said they could make magic cloth. \"It is invisible to foolish people,\" they said.\n\nThe Emperor paid them lots of gold. They pretended to weave, but there was no cloth!\n\nThe Emperor put on the \"magic\" clothes. He could not see them, but he did not want to look foolish. So he walked in a parade wearing nothing at all!\n\nEveryone cheered until a little boy shouted, \"The Emperor has no clothes!\"\n\nEveryone laughed. The Emperor learned a lesson about being honest.",
+        questions: [
+          { q: "What did the weavers say about the cloth?", options: ["It was invisible to foolish people", "It was made of gold", "It was very soft"], answer: 0 },
+          { q: "Who told the truth about the Emperor?", options: ["A little boy", "The weavers", "A soldier"], answer: 0 },
+          { q: "What lesson did the Emperor learn?", options: ["To be honest", "To buy more clothes", "To trust weavers"], answer: 0 }
+        ]
+      },
+      {
+        id: 'goldilocks', title: 'Goldilocks and the Three Bears', emoji: '🐻',
+        text: "Once upon a time, a little girl named Goldilocks went for a walk in the forest. She found a cottage and went inside.\n\nOn the table were three bowls of porridge. She tasted the big bowl. \"Too hot!\" She tasted the medium bowl. \"Too cold!\" She tasted the small bowl. \"Just right!\" And she ate it all up.\n\nThen she found three chairs. The big chair was too hard. The medium chair was too soft. The little chair was just right! But it broke!\n\nShe went upstairs and found three beds. She fell asleep in the smallest bed.\n\nWhen the three bears came home, Baby Bear cried, \"Someone has been sleeping in my bed, and she is still there!\"\n\nGoldilocks woke up, saw the bears, and ran out of the cottage as fast as she could!",
+        questions: [
+          { q: "Whose porridge did Goldilocks eat?", options: ["Baby Bear's", "Papa Bear's", "Mama Bear's"], answer: 0 },
+          { q: "What happened to the little chair?", options: ["It broke", "It was too hard", "It was too big"], answer: 0 },
+          { q: "What did Goldilocks do when she saw the bears?", options: ["She ran away", "She said hello", "She went back to sleep"], answer: 0 }
+        ]
+      },
+      {
+        id: 'wolf', title: 'The Boy Who Cried Wolf', emoji: '🐺',
+        text: "A shepherd boy watched over the village sheep. He got bored and cried, \"Wolf! Wolf!\" The villagers came running, but there was no wolf. The boy laughed.\n\nThe next day, he did it again. \"Wolf! Wolf!\" The villagers came again, but there was no wolf. They were angry.\n\nThen one day, a real wolf came! The boy cried, \"Wolf! Wolf! Please help!\" But nobody came. They thought he was lying again.\n\nThe wolf chased the sheep away. The boy learned that nobody believes a liar, even when they are telling the truth.",
+        questions: [
+          { q: "What was the boy's job?", options: ["Watching over sheep", "Hunting wolves", "Selling food"], answer: 0 },
+          { q: "Why didn't the villagers come the third time?", options: ["They thought he was lying", "They were sleeping", "They couldn't hear him"], answer: 0 },
+          { q: "What is the lesson of this story?", options: ["Nobody believes a liar", "Wolves are scary", "Don't watch sheep"], answer: 0 }
+        ]
+      },
+      {
+        id: 'beanstalk', title: 'Jack and the Beanstalk', emoji: '🌱',
+        text: "Jack and his mother were very poor. Jack sold their cow for magic beans. His mother was angry and threw the beans out the window.\n\nThe next morning, a giant beanstalk had grown up to the sky! Jack climbed up and found a castle in the clouds.\n\nInside lived a giant with bags of gold coins and a hen that laid golden eggs. While the giant slept, Jack took the hen and climbed down.\n\n\"Fee-fi-fo-fum!\" roared the giant, chasing Jack down the beanstalk.\n\nJack chopped down the beanstalk with an axe. The giant fell, and Jack and his mother lived happily with the golden hen.",
+        questions: [
+          { q: "What did Jack trade the cow for?", options: ["Magic beans", "Gold coins", "A hen"], answer: 0 },
+          { q: "What did Jack find at the top of the beanstalk?", options: ["A castle in the clouds", "A rainbow", "Another farm"], answer: 0 },
+          { q: "How did Jack stop the giant?", options: ["He chopped down the beanstalk", "He hid in a cave", "He ran very fast"], answer: 0 }
+        ]
+      },
+      {
+        id: 'redhood', title: 'Little Red Riding Hood', emoji: '🧣',
+        text: "Little Red Riding Hood was going to visit her grandmother. She wore her favorite red hood and carried a basket of food.\n\nIn the forest, a sneaky wolf asked where she was going. \"To my grandmother's house,\" she said.\n\nThe wolf ran ahead and pretended to be the grandmother! He got into bed and pulled the covers up.\n\n\"What big eyes you have!\" said Red. \"The better to see you with,\" said the wolf.\n\"What big teeth you have!\" \"The better to EAT you with!\"\n\nA brave woodcutter heard the noise and came to help. He chased the wolf away, and Red Riding Hood hugged her real grandmother.",
+        questions: [
+          { q: "What was Red Riding Hood carrying?", options: ["A basket of food", "A book", "Flowers"], answer: 0 },
+          { q: "Who pretended to be the grandmother?", options: ["The wolf", "The woodcutter", "A bear"], answer: 0 },
+          { q: "Who saved Red Riding Hood?", options: ["A woodcutter", "Her mother", "A hunter"], answer: 0 }
+        ]
+      },
+      {
+        id: 'antgrass', title: 'The Ant and the Grasshopper', emoji: '🦗',
+        text: "In the summer, a busy Ant worked hard to store food for winter. She carried crumbs and seeds to her home every single day.\n\nA Grasshopper watched and laughed. \"Why work so hard? Come play and sing with me!\" he said.\n\n\"I must save food for winter,\" said the Ant. The Grasshopper just kept singing.\n\nWhen winter came, the Ant had plenty of food in her warm home. But the Grasshopper had nothing to eat. He was cold and hungry.\n\nHe went to the Ant and asked for help. The kind Ant shared her food and said, \"Next summer, let's work together!\"\n\nThe Grasshopper learned that it is best to prepare for the future.",
+        questions: [
+          { q: "What did the Ant do all summer?", options: ["Stored food for winter", "Played and sang", "Built a new house"], answer: 0 },
+          { q: "What happened to the Grasshopper in winter?", options: ["He had no food and was hungry", "He moved to a warm place", "He found lots of food"], answer: 0 },
+          { q: "What is the lesson of this story?", options: ["Prepare for the future", "Always play and have fun", "Never share your food"], answer: 0 }
+        ]
       }
     ];
 
@@ -4256,11 +4483,22 @@
     }
 
     function openStoryReader(story) {
+      currentQuizStory = story;
       document.getElementById('storyLibrary').style.display = 'none';
       document.getElementById('storyReader').style.display = 'flex';
 
       document.getElementById('readerTitle').textContent = story.title;
-      document.getElementById('readerContent').innerText = story.text; // Preserves newlines
+      document.getElementById('readerContent').innerText = story.text;
+      document.getElementById('readerContent').style.display = 'block';
+
+      // Show quiz button if story has questions
+      const quizBtn = document.getElementById('quizBtn');
+      quizBtn.style.display = (story.questions && story.questions.length > 0) ? 'inline-block' : 'none';
+      document.getElementById('readAloudBtn').style.display = 'inline-block';
+
+      // Reset quiz area
+      const quizArea = document.getElementById('quizArea');
+      if (quizArea) quizArea.style.display = 'none';
 
       // Reset reading state
       stopReading();
@@ -4337,6 +4575,94 @@
       document.getElementById('storyLibrary').style.display = 'grid';
     }
 
+    // ===== STORY QUIZ =====
+    let currentQuizStory = null;
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+
+    function startStoryQuiz() {
+      if (!currentQuizStory || !currentQuizStory.questions) return;
+      stopReading();
+      currentQuizIndex = 0;
+      quizScore = 0;
+      document.getElementById('readerContent').style.display = 'none';
+      document.getElementById('quizArea').style.display = 'block';
+      document.getElementById('quizBtn').style.display = 'none';
+      document.getElementById('readAloudBtn').style.display = 'none';
+      showQuizQuestion();
+    }
+
+    function showQuizQuestion() {
+      const q = currentQuizStory.questions[currentQuizIndex];
+      document.getElementById('quizQuestion').textContent = q.q;
+      document.getElementById('quizProgress').textContent =
+        `Question ${currentQuizIndex + 1} of ${currentQuizStory.questions.length}`;
+      document.getElementById('quizFeedback').textContent = '';
+
+      const container = document.getElementById('quizOptions');
+      container.innerHTML = '';
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option-btn';
+        btn.textContent = opt;
+        btn.onclick = () => checkQuizAnswer(i, btn);
+        container.appendChild(btn);
+      });
+    }
+
+    function checkQuizAnswer(selectedIndex, btn) {
+      const q = currentQuizStory.questions[currentQuizIndex];
+      const allBtns = document.querySelectorAll('.quiz-option-btn');
+      allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+      if (selectedIndex === q.answer) {
+        btn.classList.add('correct');
+        quizScore++;
+        state.totalStars++;
+        saveGameState();
+        playCorrectSound();
+        document.getElementById('quizFeedback').textContent = 'Correct! Great job! ⭐';
+        document.getElementById('quizFeedback').style.color = '#2ECC71';
+      } else {
+        btn.classList.add('wrong');
+        allBtns[q.answer].classList.add('correct');
+        playEncouragementSound();
+        document.getElementById('quizFeedback').textContent = `The answer is: ${q.options[q.answer]}`;
+        document.getElementById('quizFeedback').style.color = '#E74C3C';
+      }
+
+      setTimeout(() => {
+        currentQuizIndex++;
+        if (currentQuizIndex < currentQuizStory.questions.length) {
+          showQuizQuestion();
+        } else {
+          showQuizSummary();
+        }
+      }, 2000);
+    }
+
+    function showQuizSummary() {
+      const container = document.getElementById('quizOptions');
+      container.innerHTML = '';
+      const total = currentQuizStory.questions.length;
+      document.getElementById('quizQuestion').textContent =
+        quizScore === total ? `Perfect! ${quizScore}/${total} correct!` :
+        `You got ${quizScore} out of ${total}!`;
+      document.getElementById('quizFeedback').textContent =
+        quizScore === total ? 'You are a reading superstar! 🌟' : 'Great reading! Keep it up! 📚';
+      document.getElementById('quizFeedback').style.color = '#8E24AA';
+      document.getElementById('quizProgress').innerHTML =
+        '<button class="key-btn" style="padding: 8px 20px; margin-top: 10px; font-size: 1rem;" onclick="backFromQuiz()">📖 Back to Story</button>';
+      if (quizScore > 0) spawnConfetti(quizScore * 5);
+    }
+
+    function backFromQuiz() {
+      document.getElementById('quizArea').style.display = 'none';
+      document.getElementById('readerContent').style.display = 'block';
+      document.getElementById('quizBtn').style.display = 'inline-block';
+      document.getElementById('readAloudBtn').style.display = 'inline-block';
+    }
+
     // ===== US HISTORY LOGIC =====
     const historyFacts = [
       { emoji: '🇺🇸', text: "The American flag has 50 stars! One for each state." },
@@ -4353,7 +4679,21 @@
       { emoji: '🪙', text: "Abraham Lincoln is on the penny. He was very tall and wore a big hat!" },
       { emoji: '✈️', text: "The Wright Brothers flew the first airplane in 1903." },
       { emoji: '🐻', text: "The Teddy Bear is named after President Theodore 'Teddy' Roosevelt." },
-      { emoji: '🌉', text: "The Golden Gate Bridge in San Francisco is actually painted 'International Orange'!" }
+      { emoji: '🌉', text: "The Golden Gate Bridge in San Francisco is actually painted 'International Orange'!" },
+      { emoji: '🚂', text: "Harriet Tubman helped over 300 people escape to freedom on the Underground Railroad!" },
+      { emoji: '✊', text: "Martin Luther King Jr. had a dream that everyone would be treated equally." },
+      { emoji: '🦃', text: "The first Thanksgiving feast lasted three whole days!" },
+      { emoji: '🚌', text: "Rosa Parks bravely refused to give up her seat on the bus in 1955." },
+      { emoji: '⛵', text: "The Mayflower brought the Pilgrims to America in 1620. The trip took 66 days!" },
+      { emoji: '📜', text: "The Declaration of Independence was signed on July 4th, 1776. That is why we celebrate the Fourth of July!" },
+      { emoji: '👨‍🚀', text: "Twelve people have walked on the Moon, and they were all Americans!" },
+      { emoji: '🗿', text: "Mount Rushmore has the faces of four presidents carved into a mountain!" },
+      { emoji: '🏜️', text: "The Grand Canyon is over a mile deep. You could stack four Empire State Buildings inside it!" },
+      { emoji: '⚡', text: "Benjamin Franklin flew a kite in a thunderstorm to learn about electricity!" },
+      { emoji: '🐎', text: "Paul Revere rode a horse at midnight to warn that soldiers were coming!" },
+      { emoji: '🧵', text: "Betsy Ross is believed to have sewn the first American flag with 13 stars." },
+      { emoji: '🎺', text: "The Star-Spangled Banner became the national anthem in 1931." },
+      { emoji: '🏔️', text: "Alaska is the biggest state. You could fit Texas inside it two times!" }
     ];
 
     function openHistory() {
@@ -4436,6 +4776,7 @@
 
     // ===== PROBLEM GENERATION =====
     function generateProblem() {
+      resetHints();
       let op = state.operation;
       if (op === 'mix') op = ['add', 'sub', 'mul', 'div'][randInt(0, 3)];
 
@@ -4481,12 +4822,16 @@
 
     // ===== SITE WORDS =====
     const siteWords = {
-      1: ["the", "to", "and", "he", "a", "i", "you", "it", "of", "in", "was", "said", "his", "that", "she", "for", "on", "they", "but", "had"],
-      2: ["at", "him", "with", "up", "all", "look", "is", "her", "there", "some", "out", "as", "be", "have", "go", "we", "am", "then", "little", "down"],
-      3: ["do", "can", "could", "when", "did", "what", "so", "see", "not", "were", "get", "them", "like", "one", "this", "my", "would", "me", "will", "yes"]
+      1: ["the", "to", "and", "he", "a", "i", "you", "it", "of", "in", "was", "said", "his", "that", "she", "for", "on", "they", "but", "had",
+          "no", "are", "if", "an", "from", "or", "by", "how", "her", "has", "him", "two", "way", "who", "its", "day", "did", "new", "now", "old"],
+      2: ["at", "him", "with", "up", "all", "look", "is", "her", "there", "some", "out", "as", "be", "have", "go", "we", "am", "then", "little", "down",
+          "over", "come", "back", "only", "our", "even", "most", "also", "after", "made", "well", "long", "big", "too", "any", "much", "just", "very", "more", "know"],
+      3: ["do", "can", "could", "when", "did", "what", "so", "see", "not", "were", "get", "them", "like", "one", "this", "my", "would", "me", "will", "yes",
+          "take", "into", "your", "good", "work", "first", "give", "because", "many", "tell", "help", "think", "every", "where", "want", "make", "about", "been", "people", "year"]
     };
 
     function generateWordProblem() {
+      resetHints();
       const level = Math.min(state.level, 3);
       const list = siteWords[level] || siteWords[1];
       const target = list[randInt(0, list.length - 1)];
@@ -4537,7 +4882,6 @@
       if (word === state.correctAnswer) {
         // CORRECT
         btn.classList.add('correct');
-        state.score++; state.totalStars++; state.streak++; state.questionsCorrect++; state.wrongStreak = 0;
         state.score++; state.totalStars++; state.streak++; state.questionsCorrect++; state.wrongStreak = 0;
         if (state.streak > state.bestStreak) state.bestStreak = state.streak;
 
@@ -4591,6 +4935,223 @@
       }, 2000);
     }
 
+    // ===== PHONICS =====
+    const phonicsData = {
+      sameSounds: {
+        1: [
+          { target: "Bear", emoji: "🐻", options: ["Ball", "Cat", "Dog", "Fish"], answer: "Ball" },
+          { target: "Cat", emoji: "🐱", options: ["Cup", "Dog", "Egg", "Hat"], answer: "Cup" },
+          { target: "Dog", emoji: "🐶", options: ["Duck", "Pig", "Sun", "Bed"], answer: "Duck" },
+          { target: "Fish", emoji: "🐟", options: ["Fox", "Hen", "Map", "Run"], answer: "Fox" },
+          { target: "Hat", emoji: "🎩", options: ["Hen", "Cat", "Sun", "Ball"], answer: "Hen" },
+          { target: "Moon", emoji: "🌙", options: ["Map", "Sun", "Cat", "Dog"], answer: "Map" },
+          { target: "Sun", emoji: "☀️", options: ["Sit", "Ball", "Dog", "Fox"], answer: "Sit" },
+          { target: "Pig", emoji: "🐷", options: ["Pen", "Cat", "Dog", "Sun"], answer: "Pen" },
+          { target: "Ring", emoji: "💍", options: ["Run", "Cat", "Dog", "Sun"], answer: "Run" },
+          { target: "Tree", emoji: "🌳", options: ["Top", "Cat", "Dog", "Sun"], answer: "Top" },
+          { target: "Nest", emoji: "🪺", options: ["Net", "Bat", "Cup", "Rug"], answer: "Net" },
+          { target: "Goat", emoji: "🐐", options: ["Gem", "Pen", "Hat", "Bed"], answer: "Gem" },
+          { target: "Kite", emoji: "🪁", options: ["King", "Dog", "Bat", "Sun"], answer: "King" },
+          { target: "Leaf", emoji: "🍃", options: ["Leg", "Map", "Fin", "Top"], answer: "Leg" },
+          { target: "Wig", emoji: "💇", options: ["Web", "Hat", "Pen", "Cup"], answer: "Web" }
+        ],
+        2: [
+          { target: "Butterfly", emoji: "🦋", options: ["Bridge", "Spider", "Flower", "Rainbow"], answer: "Bridge" },
+          { target: "Spider", emoji: "🕷️", options: ["Star", "Moon", "Cloud", "Bird"], answer: "Star" },
+          { target: "Flower", emoji: "🌸", options: ["Frog", "Tiger", "Snake", "Horse"], answer: "Frog" },
+          { target: "Rainbow", emoji: "🌈", options: ["Rabbit", "Garden", "Candle", "Turtle"], answer: "Rabbit" },
+          { target: "Tiger", emoji: "🐯", options: ["Turtle", "Rabbit", "Spider", "Flower"], answer: "Turtle" },
+          { target: "Horse", emoji: "🐴", options: ["Hippo", "Snake", "Frog", "Tiger"], answer: "Hippo" },
+          { target: "Snake", emoji: "🐍", options: ["Snail", "Frog", "Tiger", "Horse"], answer: "Snail" },
+          { target: "Candle", emoji: "🕯️", options: ["Castle", "Bridge", "Spider", "Flower"], answer: "Castle" },
+          { target: "Garden", emoji: "🌻", options: ["Ghost", "Tiger", "Horse", "Snail"], answer: "Ghost" },
+          { target: "Whale", emoji: "🐋", options: ["Window", "Tiger", "Frog", "Snake"], answer: "Window" },
+          { target: "Dragon", emoji: "🐉", options: ["Drum", "Frog", "Tiger", "Snake"], answer: "Drum" },
+          { target: "Parrot", emoji: "🦜", options: ["Pencil", "Tiger", "Horse", "Frog"], answer: "Pencil" },
+          { target: "Mountain", emoji: "⛰️", options: ["Monkey", "Tiger", "Snake", "Frog"], answer: "Monkey" },
+          { target: "Jacket", emoji: "🧥", options: ["Juggle", "Tiger", "Horse", "Snake"], answer: "Juggle" },
+          { target: "Volcano", emoji: "🌋", options: ["Violin", "Tiger", "Horse", "Snake"], answer: "Violin" }
+        ],
+        3: [
+          { target: "Elephant", emoji: "🐘", options: ["Engine", "Bicycle", "Trumpet", "Rainbow"], answer: "Engine" },
+          { target: "Bicycle", emoji: "🚲", options: ["Banana", "Trumpet", "Rainbow", "Engine"], answer: "Banana" },
+          { target: "Trumpet", emoji: "🎺", options: ["Triangle", "Rainbow", "Engine", "Banana"], answer: "Triangle" },
+          { target: "Chocolate", emoji: "🍫", options: ["Champion", "Rainbow", "Engine", "Banana"], answer: "Champion" },
+          { target: "Penguin", emoji: "🐧", options: ["Puzzle", "Rainbow", "Engine", "Banana"], answer: "Puzzle" },
+          { target: "Strawberry", emoji: "🍓", options: ["Submarine", "Rainbow", "Engine", "Banana"], answer: "Submarine" },
+          { target: "Dinosaur", emoji: "🦕", options: ["Diamond", "Rainbow", "Engine", "Banana"], answer: "Diamond" },
+          { target: "Waterfall", emoji: "🏞️", options: ["Wizard", "Rainbow", "Engine", "Banana"], answer: "Wizard" },
+          { target: "Jellyfish", emoji: "🪼", options: ["Jungle", "Rainbow", "Engine", "Banana"], answer: "Jungle" },
+          { target: "Flamingo", emoji: "🦩", options: ["Fortress", "Rainbow", "Engine", "Banana"], answer: "Fortress" },
+          { target: "Umbrella", emoji: "☂️", options: ["Unicorn", "Rainbow", "Engine", "Banana"], answer: "Unicorn" },
+          { target: "Mushroom", emoji: "🍄", options: ["Mystery", "Rainbow", "Engine", "Banana"], answer: "Mystery" },
+          { target: "Kangaroo", emoji: "🦘", options: ["Kitchen", "Rainbow", "Engine", "Banana"], answer: "Kitchen" },
+          { target: "Octopus", emoji: "🐙", options: ["Orange", "Rainbow", "Engine", "Banana"], answer: "Orange" },
+          { target: "Giraffe", emoji: "🦒", options: ["Guitar", "Rainbow", "Engine", "Banana"], answer: "Guitar" }
+        ]
+      },
+      rhymes: {
+        1: [
+          { target: "cat", options: ["hat", "dog", "sun", "pen"], answer: "hat" },
+          { target: "dog", options: ["log", "cat", "pen", "sun"], answer: "log" },
+          { target: "sun", options: ["fun", "dog", "cat", "pen"], answer: "fun" },
+          { target: "bed", options: ["red", "dog", "cat", "pen"], answer: "red" },
+          { target: "ball", options: ["tall", "dog", "cat", "pen"], answer: "tall" },
+          { target: "cake", options: ["lake", "dog", "cat", "pen"], answer: "lake" },
+          { target: "ring", options: ["king", "dog", "cat", "pen"], answer: "king" },
+          { target: "bug", options: ["rug", "cat", "sun", "pen"], answer: "rug" },
+          { target: "boat", options: ["coat", "dog", "cat", "pen"], answer: "coat" },
+          { target: "tree", options: ["free", "dog", "cat", "pen"], answer: "free" },
+          { target: "map", options: ["cap", "dog", "sun", "hen"], answer: "cap" },
+          { target: "hen", options: ["ten", "dog", "sun", "cat"], answer: "ten" },
+          { target: "hop", options: ["top", "cat", "sun", "pen"], answer: "top" },
+          { target: "fan", options: ["man", "dog", "cat", "sun"], answer: "man" },
+          { target: "pig", options: ["big", "cat", "sun", "pen"], answer: "big" }
+        ],
+        2: [
+          { target: "night", options: ["light", "house", "bread", "green"], answer: "light" },
+          { target: "rain", options: ["train", "cloud", "mouse", "bread"], answer: "train" },
+          { target: "moon", options: ["spoon", "cloud", "house", "bread"], answer: "spoon" },
+          { target: "block", options: ["clock", "house", "cloud", "bread"], answer: "clock" },
+          { target: "bear", options: ["chair", "cloud", "house", "bread"], answer: "chair" },
+          { target: "nail", options: ["tail", "cloud", "house", "bread"], answer: "tail" },
+          { target: "corn", options: ["horn", "cloud", "house", "bread"], answer: "horn" },
+          { target: "deep", options: ["sheep", "cloud", "house", "bread"], answer: "sheep" },
+          { target: "dish", options: ["fish", "cloud", "house", "bread"], answer: "fish" },
+          { target: "park", options: ["dark", "cloud", "house", "bread"], answer: "dark" },
+          { target: "truck", options: ["duck", "cloud", "house", "bread"], answer: "duck" },
+          { target: "sing", options: ["wing", "cloud", "house", "bread"], answer: "wing" },
+          { target: "nest", options: ["best", "cloud", "house", "bread"], answer: "best" },
+          { target: "cold", options: ["gold", "cloud", "house", "bread"], answer: "gold" },
+          { target: "hike", options: ["bike", "cloud", "house", "bread"], answer: "bike" }
+        ],
+        3: [
+          { target: "ground", options: ["sound", "flower", "castle", "engine"], answer: "sound" },
+          { target: "dream", options: ["stream", "flower", "castle", "engine"], answer: "stream" },
+          { target: "space", options: ["place", "flower", "castle", "engine"], answer: "place" },
+          { target: "bright", options: ["flight", "flower", "castle", "engine"], answer: "flight" },
+          { target: "snail", options: ["trail", "flower", "castle", "engine"], answer: "trail" },
+          { target: "stone", options: ["phone", "flower", "castle", "engine"], answer: "phone" },
+          { target: "sweet", options: ["street", "flower", "castle", "engine"], answer: "street" },
+          { target: "crown", options: ["brown", "flower", "castle", "engine"], answer: "brown" },
+          { target: "smile", options: ["while", "flower", "castle", "engine"], answer: "while" },
+          { target: "flower", options: ["tower", "castle", "engine", "garden"], answer: "tower" },
+          { target: "cheese", options: ["freeze", "castle", "engine", "flower"], answer: "freeze" },
+          { target: "whale", options: ["scale", "castle", "engine", "flower"], answer: "scale" },
+          { target: "brain", options: ["chain", "castle", "engine", "flower"], answer: "chain" },
+          { target: "plate", options: ["skate", "castle", "engine", "flower"], answer: "skate" },
+          { target: "think", options: ["drink", "castle", "engine", "flower"], answer: "drink" }
+        ]
+      }
+    };
+
+    let phonicsSubMode = 'rhymes'; // will toggle to sameSounds first
+
+    function generatePhonicsProblem() {
+      resetHints();
+      phonicsSubMode = (phonicsSubMode === 'sameSounds') ? 'rhymes' : 'sameSounds';
+
+      const level = Math.min(state.level, 3);
+      const pool = phonicsData[phonicsSubMode][level] || phonicsData[phonicsSubMode][1];
+      const item = pool[randInt(0, pool.length - 1)];
+      state.correctAnswer = item.answer;
+
+      const prompt = document.getElementById('phonicsPrompt');
+      const target = document.getElementById('phonicsTarget');
+
+      if (phonicsSubMode === 'sameSounds') {
+        prompt.textContent = "What starts with the same sound?";
+        target.textContent = `${item.emoji} ${item.target}`;
+      } else {
+        prompt.textContent = "Which word rhymes?";
+        target.textContent = `"${item.target}"`;
+      }
+
+      // Shuffle options
+      const options = [...item.options].sort(() => Math.random() - 0.5);
+
+      const container = document.getElementById('wordOptions');
+      container.innerHTML = '';
+      options.forEach(word => {
+        const btn = document.createElement('button');
+        btn.className = 'word-btn';
+        btn.textContent = word;
+        btn.onclick = () => checkPhonicAnswer(word, btn);
+        container.appendChild(btn);
+      });
+
+      setTimeout(() => {
+        if (phonicsSubMode === 'sameSounds') {
+          speak(`What starts with the same sound as ${item.target}?`);
+        } else {
+          speak(`What rhymes with ${item.target}?`);
+        }
+      }, 500);
+    }
+
+    function checkPhonicAnswer(word, btn) {
+      if (state.waiting) return;
+      state.waiting = true;
+
+      const rect = btn.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top;
+
+      if (word === state.correctAnswer) {
+        btn.classList.add('correct');
+        state.score++; state.totalStars++; state.streak++; state.questionsCorrect++; state.wrongStreak = 0;
+        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+
+        playCorrectSound();
+        document.getElementById('scoreDisplay').classList.add('pop');
+        setTimeout(() => document.getElementById('scoreDisplay').classList.remove('pop'), 500);
+        starCollectAnim(cx, cy);
+        setLabubuState('gameLabubu', 'happy');
+        showFeedback(true);
+        speakRandom('correct');
+
+        if (state.jokesAvailable < 3) {
+          state.jokesAvailable++;
+          updateJokeButton();
+        }
+
+        if (state.questionsCorrect % 5 === 0 && state.questionsCorrect > 0) {
+          document.getElementById('labubuHat').classList.add('show');
+          playMilestoneSound();
+          showBubble('gameBubble', `${state.questionsCorrect} stars! 🌟`, 2500);
+          setTimeout(() => document.getElementById('labubuHat').classList.remove('show'), 3000);
+        }
+
+        // Level up
+        if (state.streak % 3 === 0 && state.level < 3) {
+          state.level++;
+          showBubble('gameBubble', 'Level Up! ⬆️', 2000);
+        }
+
+        saveGameState();
+      } else {
+        btn.classList.add('wrong');
+        state.streak = 0; state.wrongStreak++;
+        setLabubuState('gameLabubu', 'sad');
+        showFeedback(false);
+        speak(`The answer is ${state.correctAnswer}`);
+      }
+
+      state.questionsAnswered++;
+      updateUI();
+
+      setTimeout(() => {
+        if (state.questionsAnswered >= state.totalQuestions) {
+          showSummary();
+        } else {
+          setLabubuState('gameLabubu', 'idle');
+          hideFeedback();
+          generatePhonicsProblem();
+          state.waiting = false;
+        }
+      }, 2000);
+    }
+
     // ===== SPELLING =====
     const spellingWords = {
       1: [
@@ -4625,7 +5186,6 @@
       ]
     };
     let currentSpellWord = "";
-    let currentSpellInput = []; // Array of letters for the current word slots
     let missingIndices = []; // Indices of letters that need to be filled
 
     function speakComforting(text) {
@@ -4654,67 +5214,10 @@
       kb.appendChild(back);
     }
 
-    function generateSpellingProblem() {
-      const level = Math.min(state.level, 3);
-      const list = spellingWords[level] || spellingWords[1];
-      currentSpellWord = list[randInt(0, list.length - 1)];
-      state.correctAnswer = currentSpellWord;
-
-      currentSpellInput = currentSpellWord.split('');
-      missingIndices = [];
-
-      // Determine missing letters based on level
-      if (level === 1) {
-        // Hide 1 letter (random)
-        const idx = randInt(0, currentSpellWord.length - 1);
-        missingIndices.push(idx);
-      } else if (level === 2) {
-        // Hide ~50%
-        for (let i = 0; i < currentSpellWord.length; i++) {
-          if (Math.random() > 0.5) missingIndices.push(i);
-        }
-        if (missingIndices.length === 0) missingIndices.push(randInt(0, currentSpellWord.length - 1));
-      } else {
-        // Hide all
-        for (let i = 0; i < currentSpellWord.length; i++) missingIndices.push(i);
-      }
-
-      // Setup Display
-      updateSpellDisplay();
-
-      // Speak
-      setTimeout(() => {
-        showBubble('gameBubble', 'Listen carefully... 👂', 3000);
-        speakComforting(`Spell the word: ${currentSpellWord}`);
-        setTimeout(() => speakComforting(currentSpellWord), 1500);
-      }, 500);
-    }
-
-    function updateSpellDisplay() {
-      const container = document.getElementById('spellWordDisplay');
-      container.innerHTML = '';
-
-      currentSpellWord.split('').forEach((char, i) => {
-        const slot = document.createElement('div');
-        if (missingIndices.includes(i)) {
-          // This is a missing slot
-          // Check if user has filled it (we store user input in a separate array or map)
-          // Simplified: We'll modify currentSpellInput in place? No, let's keep currentSpellInput as the "visual state"
-          // Wait, better approach:
-          // currentSpellWord is target.
-          // We need a way to track what the user has typed into the *missing* slots.
-          // Let's use `currentSpellInput` as an array where missing slots are null initially.
-        }
-      });
-
-      // Actually, let's reset: 
-      // display array holds correct chars for non-missing, and null/user-char for missing.
-    }
-
-    // Better logic for spelling state
     let spellDisplayState = []; // Array of chars or NULL
 
-    function generateSpellingProblemResolved() { // Renamed to avoid calling the half-baked one above
+    function generateSpellingProblemResolved() {
+      resetHints();
       const level = Math.min(state.level, 3);
       const list = spellingWords[level] || spellingWords[1];
       currentSpellWord = list[randInt(0, list.length - 1)];
@@ -4914,11 +5417,36 @@
         return;
       }
 
+      if (operation === 'phonics') {
+        state.operation = 'phonics';
+        state.score = 0; state.streak = 0; state.bestStreak = 0;
+        state.level = 1; state.questionsAnswered = 0; state.questionsCorrect = 0;
+        state.totalQuestions = 10;
+        state.waiting = false;
+        state.hintsUsed = 0;
+
+        updateUI();
+        showScreen('gameScreen');
+        document.getElementById('gameScreen').className = 'screen active phonics-mode';
+
+        setLabubuState('gameLabubu', 'idle');
+        document.getElementById('labubuHat').classList.remove('show');
+        hideFeedback();
+        updateHintButton();
+
+        playGameStartSound();
+        setTimeout(() => {
+          speak("Let's play with sounds!");
+          generatePhonicsProblem();
+        }, 500);
+        return;
+      }
+
       if (operation === 'words') {
         state.operation = 'words';
         state.score = 0; state.streak = 0; state.bestStreak = 0;
         state.level = 1; state.questionsAnswered = 0; state.questionsCorrect = 0;
-        state.totalQuestions = 10; // Shorter game for words
+        state.totalQuestions = 10;
         state.waiting = false;
 
         updateUI();
@@ -5174,6 +5702,74 @@
     }
     function hideFeedback() {
       document.getElementById('feedback').className = 'feedback';
+    }
+
+    // ===== HINT SYSTEM =====
+    function useHint() {
+      if (state.waiting) return;
+      if (state.hintsUsed >= state.hintsPerQuestion) {
+        showBubble('gameBubble', 'No more hints for this one! 💪', 2000);
+        return;
+      }
+
+      state.hintsUsed++;
+      state.streak = 0; // Using a hint breaks the streak
+      updateHintButton();
+      playClickSound();
+
+      if (state.operation === 'spelling') {
+        // Reveal one missing letter
+        const unfilledMissing = missingIndices.filter(idx => spellDisplayState[idx] === null);
+        if (unfilledMissing.length > 0) {
+          const revealIdx = unfilledMissing[0];
+          spellDisplayState[revealIdx] = currentSpellWord[revealIdx];
+          renderSpellDisplay();
+          showBubble('gameBubble', `Here's a letter: "${currentSpellWord[revealIdx].toUpperCase()}" 💡`, 2500);
+          speakComforting(`The letter is ${currentSpellWord[revealIdx]}`);
+          // Auto-check if all filled
+          if (!missingIndices.some(idx => spellDisplayState[idx] === null)) {
+            checkSpelling();
+          }
+        }
+      } else if (state.operation === 'words') {
+        // Read the word aloud slowly
+        speak(state.correctAnswer, 0.6, 1.2);
+        showBubble('gameBubble', 'Listen carefully... 👂💡', 2500);
+      } else if (state.operation === 'phonics') {
+        // Read the correct answer aloud
+        speak(state.correctAnswer, 0.8, 1.3);
+        showBubble('gameBubble', `Listen... "${state.correctAnswer}" 💡`, 2500);
+      } else {
+        // Math mode
+        const answer = state.correctAnswer;
+        if (state.hintsUsed === 1) {
+          const low = Math.max(0, answer - randInt(2, 5));
+          const high = answer + randInt(2, 5);
+          showBubble('gameBubble', `Between ${low} and ${high} 💡`, 3000);
+          speak(`The answer is between ${low} and ${high}`);
+        } else {
+          if (answer % 2 === 0) {
+            showBubble('gameBubble', "It's an even number! 💡", 2500);
+            speak("It's an even number!");
+          } else {
+            showBubble('gameBubble', "It's an odd number! 💡", 2500);
+            speak("It's an odd number!");
+          }
+        }
+      }
+    }
+
+    function updateHintButton() {
+      const btn = document.getElementById('hintBtn');
+      if (!btn) return;
+      const remaining = state.hintsPerQuestion - state.hintsUsed;
+      btn.textContent = `💡 Hint (${remaining})`;
+      btn.disabled = remaining <= 0;
+    }
+
+    function resetHints() {
+      state.hintsUsed = 0;
+      updateHintButton();
     }
 
     function setLabubuState(id, stateName) {

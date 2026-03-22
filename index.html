@@ -3053,9 +3053,9 @@
   <!-- ==================== SPLASH SCREEN ==================== -->
   <div class="screen active" id="splashScreen" style="background: linear-gradient(135deg, #FFE6F0 0%, #E8D5F5 100%); z-index: 1000;">
     <div style="text-align: center;">
-      <div style="font-size: 3rem; margin-bottom: 20px; animation: bounce 1.5s ease-in-out infinite;">⭐</div>
-      <h2 style="color: #4A4A6A; margin-bottom: 10px;">Labubu Adventure</h2>
-      <p style="color: #6A6A8A; font-size: 1.1rem;">Loading magic...</p>
+      <div id="themeLogo" style="font-size: 3rem; margin-bottom: 20px; animation: bounce 1.5s ease-in-out infinite;">⭐</div>
+      <h2 id="themeTitle" style="color: #4A4A6A; margin-bottom: 10px;">Labubu Adventure</h2>
+      <p id="themeSubtitle" style="color: #6A6A8A; font-size: 1.1rem;">Loading magic...</p>
     </div>
   </div>
 
@@ -6949,6 +6949,52 @@
       }
       localStorage.setItem('selectedTheme', themeName);
       updateThemeButton();
+      updateThemeLogo(themeName);
+    }
+
+    function updateThemeLogo(themeName) {
+      const logoEl = document.getElementById('themeLogo');
+      const titleEl = document.getElementById('themeTitle');
+      const subtitleEl = document.getElementById('themeSubtitle');
+
+      if (!logoEl) return;
+
+      const themes = {
+        'default': {
+          logo: '⭐',
+          title: 'Labubu Adventure',
+          subtitle: 'Loading magic...',
+          titleColor: '#4A4A6A',
+          subtitleColor: '#6A6A8A'
+        },
+        'bheem-theme': {
+          logo: '💪',
+          title: 'Bheem Adventure',
+          subtitle: 'Be Strong! 🦸‍♂️',
+          titleColor: '#8B4513',
+          subtitleColor: '#FF9500'
+        },
+        'krishna-theme': {
+          logo: '🪶',
+          title: 'Krishna Adventure',
+          subtitle: 'Divine Learning! 💛',
+          titleColor: '#FFD700',
+          subtitleColor: '#1E3A8A'
+        }
+      };
+
+      const theme = themes[themeName] || themes['default'];
+      logoEl.textContent = theme.logo;
+
+      if (titleEl) {
+        titleEl.textContent = theme.title;
+        titleEl.style.color = theme.titleColor;
+      }
+
+      if (subtitleEl) {
+        subtitleEl.textContent = theme.subtitle;
+        subtitleEl.style.color = theme.subtitleColor;
+      }
     }
 
     function toggleTheme() {
@@ -6994,6 +7040,7 @@
       const themeIndex = THEMES.indexOf(savedTheme);
       currentThemeIndex = themeIndex >= 0 ? themeIndex : 0;
       applyTheme(THEMES[currentThemeIndex]);
+      updateThemeLogo(THEMES[currentThemeIndex]);
       startAutoThemeRotation();
     }
 

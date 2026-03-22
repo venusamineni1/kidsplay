@@ -3086,6 +3086,7 @@
       <button class="op-btn spell-btn" onclick="startGame('spelling')"><span class="op-icon">🔤</span>Spelling</button>
       <button class="op-btn phonics-btn" onclick="startGame('phonics')"><span class="op-icon">🎵</span>Phonics</button>
       <button class="op-btn" style="background: linear-gradient(135deg, #4DB8A8, #26A69A); color: white;" onclick="startGame('science')"><span class="op-icon">🔬</span>Science</button>
+      <button class="op-btn" style="background: linear-gradient(135deg, #FFD84D, #FFC107); color: white;" onclick="startGame('geography')"><span class="op-icon">🌍</span>World Explorer</button>
       <button class="op-btn joke-btn" onclick="tellJoke()"><span class="op-icon">😂</span>Tell me a Joke</button>
       <button class="op-btn" style="background: linear-gradient(135deg, #FFD54F, #FFCA28); color: #fff;"
         onclick="openShop()"><span class="op-icon">🏪</span>Shop</button>
@@ -3341,6 +3342,80 @@
       animation: wrongShake 0.4s;
     }
 
+    /* Geography Mode Styles */
+    .screen.geography-mode .numpad,
+    .screen.geography-mode .problem-display,
+    .screen.geography-mode .answer-display,
+    .screen.geography-mode .word-options,
+    .screen.geography-mode .spelling-area,
+    .screen.geography-mode .phonics-prompt,
+    .screen.geography-mode .phonics-target,
+    .screen.geography-mode #scienceArea {
+      display: none;
+    }
+
+    .screen.geography-mode #geographyArea {
+      display: block;
+    }
+
+    .screen.geography-mode .labubu {
+      margin-bottom: 20px;
+    }
+
+    .geography-clue {
+      background: linear-gradient(135deg, rgba(77, 184, 168, 0.1), rgba(38, 166, 154, 0.1));
+      padding: 12px 15px;
+      margin: 8px 0;
+      border-left: 4px solid #4DB8A8;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #4A4A6A;
+      font-weight: 500;
+    }
+
+    .geography-clue.revealed {
+      opacity: 0.6;
+    }
+
+    .geography-clue.new {
+      animation: slideIn 0.4s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    #geographyInput {
+      transition: all 0.2s;
+    }
+
+    #geographyInput:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(77, 184, 168, 0.2);
+    }
+
+    #geographyInput.correct {
+      background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+      border-color: #4CAF50 !important;
+      color: #2E7D32;
+    }
+
+    #geographyInput.wrong {
+      background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+      border-color: #FF7675 !important;
+      color: #C62828;
+    }
+
+    #geographySubmitBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    #geographySubmitBtn:active {
+      transform: translateY(-1px);
+    }
+
     /* Spelling Mode Styles */
     .spell-btn {
       grid-column: 1 / -1;
@@ -3560,6 +3635,24 @@
       </div>
       <div id="scienceTopic" style="text-align: center; font-size: 0.9rem; color: #999; margin-top: 10px;">
         Category: Animals & Wildlife
+      </div>
+    </div>
+
+    <!-- World Explorer Geography Game Area -->
+    <div id="geographyArea" style="display: none; width: 100%; max-width: 600px;">
+      <div id="geographyRegionLabel" style="text-align: center; font-size: 0.9rem; color: #999; margin-bottom: 10px;">
+        Category: Capitals & Countries
+      </div>
+      <div id="geographyClues" style="margin: 20px 0;">
+        <!-- Clues will be displayed here -->
+      </div>
+      <div style="margin: 30px 0; text-align: center;">
+        <input type="text" id="geographyInput" placeholder="Type your answer..."
+          style="font-size: 1.1rem; padding: 12px; border: 3px solid #4DB8A8; border-radius: 10px; width: 80%; max-width: 400px; font-family: 'Bubblegum Sans', cursive; text-align: center; touch-action: manipulation;">
+        <button id="geographySubmitBtn" onclick="submitGeographyAnswer()"
+          style="margin-top: 15px; padding: 12px 30px; background: linear-gradient(135deg, #FFD84D, #FFC107); color: white; border: none; border-radius: 10px; font-size: 1.1rem; font-family: 'Bubblegum Sans', cursive; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); touch-action: manipulation;">
+          Submit
+        </button>
       </div>
     </div>
   </div>
@@ -4078,7 +4171,10 @@
       hintsPerQuestion: 2,
       // Science game
       scienceCategory: '',
-      currentScienceProblem: null
+      currentScienceProblem: null,
+      // Geography game
+      geographyRegion: '',
+      currentGeographyProblem: null
     };
 
     // ===== PERSISTENCE =====
@@ -5343,6 +5439,66 @@
       }
     };
 
+    // ===== GEOGRAPHY QUESTIONS =====
+    const geographyQuestions = {
+      capitals: {
+        1: [
+          { clues: ["Capital of France", "Famous for the Eiffel Tower", "On the Seine River"], correctAnswer: "Paris", variations: ["paris"], icon: "🇫🇷" },
+          { clues: ["Capital of Japan", "Largest city in Asia", "Known for technology"], correctAnswer: "Tokyo", variations: ["tokyo"], icon: "🇯🇵" },
+          { clues: ["Capital of Australia", "Named after a British Princess", "Home to the Opera House"], correctAnswer: "Sydney", variations: ["sydney"], icon: "🇦🇺" },
+          { clues: ["Capital of Brazil", "Built for a new capital in the 1960s", "In central Brazil"], correctAnswer: "Brasília", variations: ["brasilia", "brasilia"], icon: "🇧🇷" },
+          { clues: ["Capital of Canada", "On the Ottawa River", "Not Toronto"], correctAnswer: "Ottawa", variations: ["ottawa"], icon: "🇨🇦" },
+          { clues: ["Capital of Egypt", "Near the Nile River", "Home to many museums"], correctAnswer: "Cairo", variations: ["cairo"], icon: "🇪🇬" },
+          { clues: ["Capital of Italy", "Surrounded by Italian countryside", "Home to the Vatican"], correctAnswer: "Rome", variations: ["rome"], icon: "🇮🇹" },
+          { clues: ["Capital of Germany", "Divided by wall after WWII", "Now the largest city"], correctAnswer: "Berlin", variations: ["berlin"], icon: "🇩🇪" },
+          { clues: ["Capital of Spain", "In central Spain", "Home to Royal Palace"], correctAnswer: "Madrid", variations: ["madrid"], icon: "🇪🇸" },
+          { clues: ["Capital of Greece", "Built on a mountain", "Has the Parthenon"], correctAnswer: "Athens", variations: ["athens"], icon: "🇬🇷" }
+        ]
+      },
+      landmarks: {
+        1: [
+          { clues: ["Ancient wonder in Egypt", "Built with massive stones", "Near Giza"], correctAnswer: "Great Pyramid", variations: ["great pyramid", "pyramid of giza", "giza"], icon: "🪨" },
+          { clues: ["Statue on island in New York", "Symbolizes freedom", "Green and tall"], correctAnswer: "Statue of Liberty", variations: ["statue of liberty", "liberty statue"], icon: "🗽" },
+          { clues: ["Wall in China", "Built to keep out invaders", "Very long structure"], correctAnswer: "Great Wall of China", variations: ["great wall", "great wall of china"], icon: "🧱" },
+          { clues: ["Clock tower in England", "In London", "Rings every hour"], correctAnswer: "Big Ben", variations: ["big ben"], icon: "🕐" },
+          { clues: ["Building in Paris", "Metal structure", "Built in 1889"], correctAnswer: "Eiffel Tower", variations: ["eiffel tower", "eiffel"], icon: "🗼" },
+          { clues: ["Ancient ruins in Peru", "Lost city in mountains", "Made by Incas"], correctAnswer: "Machu Picchu", variations: ["machu picchu", "machupicchu"], icon: "⛰️" },
+          { clues: ["Carved into mountain in USA", "In South Dakota", "Four presidents carved"], correctAnswer: "Mount Rushmore", variations: ["mount rushmore", "rushmore"], icon: "👨‍👨‍👧" },
+          { clues: ["Bridge in San Francisco", "Golden colored", "Spans a bay"], correctAnswer: "Golden Gate Bridge", variations: ["golden gate", "golden gate bridge"], icon: "🌉" },
+          { clues: ["In India", "Built by emperor for wife", "White marble"], correctAnswer: "Taj Mahal", variations: ["taj mahal"], icon: "💎" },
+          { clues: ["Colosseum in Rome", "Ancient amphitheater", "Hosted gladiators"], correctAnswer: "Roman Colosseum", variations: ["colosseum", "roman colosseum"], icon: "🏛️" }
+        ]
+      },
+      continents: {
+        1: [
+          { clues: ["Largest continent", "Has China and India", "Over 4 billion people"], correctAnswer: "Asia", variations: ["asia"], icon: "🌏" },
+          { clues: ["Continent with rainforest", "Has Amazon", "Contains Brazil"], correctAnswer: "South America", variations: ["south america", "southamerica"], icon: "🌎" },
+          { clues: ["Coldest continent", "Covered in ice", "Has penguins"], correctAnswer: "Antarctica", variations: ["antarctica"], icon: "🧊" },
+          { clues: ["Largest country is Russia", "Has Europe and Asia", "Second largest continent"], correctAnswer: "Europe", variations: ["europe"], icon: "🗺️" },
+          { clues: ["Driest continent", "Has kangaroos", "Island continent"], correctAnswer: "Australia", variations: ["australia"], icon: "🦘" },
+          { clues: ["Has USA and Canada", "North of South America", "Also called North America"], correctAnswer: "North America", variations: ["north america", "northamerica"], icon: "🦅" },
+          { clues: ["Largest ocean", "Deepest ocean", "Between Asia and Americas"], correctAnswer: "Pacific Ocean", variations: ["pacific", "pacific ocean"], icon: "🌊" },
+          { clues: ["Between Europe and Africa", "Mediterranean is here", "Smaller than Pacific"], correctAnswer: "Atlantic Ocean", variations: ["atlantic", "atlantic ocean"], icon: "🌊" },
+          { clues: ["Around the North Pole", "Has Greenland", "Smallest ocean"], correctAnswer: "Arctic Ocean", variations: ["arctic", "arctic ocean"], icon: "❄️" },
+          { clues: ["Around South Pole", "Cold waters", "Where penguins swim"], correctAnswer: "Southern Ocean", variations: ["southern", "southern ocean"], icon: "🧊" }
+        ]
+      },
+      usStates: {
+        1: [
+          { clues: ["State known for oranges", "Capital is Tallahassee", "Has Miami"], correctAnswer: "Florida", variations: ["florida"], icon: "🍊" },
+          { clues: ["Largest state by area", "Capital is Juneau", "Very cold"], correctAnswer: "Alaska", variations: ["alaska"], icon: "❄️" },
+          { clues: ["Most populous state", "Capital is Sacramento", "On Pacific coast"], correctAnswer: "California", variations: ["california"], icon: "☀️" },
+          { clues: ["The Lone Star State", "Capital is Austin", "Very large"], correctAnswer: "Texas", variations: ["texas"], icon: "⭐" },
+          { clues: ["State with Statue of Liberty", "Capital is Albany", "Major city is NYC"], correctAnswer: "New York", variations: ["new york", "newyork"], icon: "🗽" },
+          { clues: ["Has Mount Rushmore", "Capital is Pierre", "Great Plains state"], correctAnswer: "South Dakota", variations: ["south dakota", "southdakota"], icon: "⛰️" },
+          { clues: ["The Grand Canyon state", "Capital is Phoenix", "Desert state"], correctAnswer: "Arizona", variations: ["arizona"], icon: "🏜️" },
+          { clues: ["Mile High city Denver", "Rocky Mountains", "Capital is Denver"], correctAnswer: "Colorado", variations: ["colorado"], icon: "🏔️" },
+          { clues: ["Space and rockets", "Capital is Houston", "NASA is here"], correctAnswer: "Texas", variations: ["texas"], icon: "🚀" },
+          { clues: ["Pacific coast state", "Rain and coffee", "Capital is Seattle"], correctAnswer: "Washington", variations: ["washington"], icon: "☔" }
+        ]
+      }
+    };
+
     let currentSpellWord = "";
     let missingIndices = []; // Indices of letters that need to be filled
 
@@ -5716,6 +5872,105 @@
       }, CONFIG.TIMING.feedback);
     }
 
+    // ===== GEOGRAPHY GAME =====
+    function generateGeographyProblem() {
+      resetHints();
+      if (!state.geographyRegion) {
+        const regions = ['capitals', 'landmarks', 'continents', 'usStates'];
+        state.geographyRegion = regions[randInt(0, 3)];
+      }
+      const regionData = geographyQuestions[state.geographyRegion];
+      const level = Math.min(state.level, 1);
+      const pool = regionData[level] || regionData[1];
+      const problem = pool[randInt(0, pool.length - 1)];
+      state.correctAnswer = problem.correctAnswer;
+      state.currentGeographyProblem = problem;
+      document.getElementById('geographyInput').value = '';
+      document.getElementById('geographyInput').className = '';
+      const regionNames = { capitals: '🌐 Capitals & Countries', landmarks: '🏛️ Landmarks & Wonders', continents: '🌍 Continents & Oceans', usStates: '🗽 US States & Cities' };
+      document.getElementById('geographyRegionLabel').textContent = `Category: ${regionNames[state.geographyRegion]}`;
+      const cluesContainer = document.getElementById('geographyClues');
+      cluesContainer.innerHTML = '';
+      problem.clues.forEach((clue, index) => {
+        const clueEl = document.createElement('div');
+        clueEl.className = 'geography-clue new';
+        clueEl.textContent = `${index + 1}. ${clue}`;
+        clueEl.style.opacity = index === 0 ? '1' : '0.6';
+        cluesContainer.appendChild(clueEl);
+      });
+      speak(`Guess: ${problem.clues[0]}`, 1.0);
+      document.getElementById('geographyInput').focus();
+      clearTimeout(state.thinkTimer);
+      state.thinkTimer = setTimeout(() => {
+        if (!state.waiting && !document.getElementById('geographyInput').value) {
+          setLabubuState('gameLabubu', 'thinking');
+          const line = voiceLines.thinking[randInt(0, voiceLines.thinking.length - 1)];
+          showBubble('gameBubble', line, 2500);
+          speakRandom('thinking');
+          setTimeout(() => { if (!state.waiting) setLabubuState('gameLabubu', 'idle'); }, 2500);
+        }
+      }, CONFIG.TIMING.thinking);
+    }
+
+    function submitGeographyAnswer() {
+      if (state.waiting) return;
+      state.waiting = true;
+      clearTimeout(state.thinkTimer);
+      const userInput = document.getElementById('geographyInput').value.trim();
+      if (!userInput) { showBubble('gameBubble', 'Please type an answer! ✍️', 2000); state.waiting = false; return; }
+      const isCorrect = checkGeographyAnswer(userInput);
+      const inputEl = document.getElementById('geographyInput');
+      if (isCorrect) {
+        inputEl.classList.add('correct');
+        state.score++; state.totalStars++; state.streak++; state.wrongStreak = 0; state.questionsCorrect++;
+        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+        if (state.streak === 3) { playStreakSound(); showBubble('gameBubble', voiceLines.streak3[randInt(0, voiceLines.streak3.length - 1)], 2500); speakRandom('streak3'); }
+        if (state.streak === 5) { playStreakSound(); showBubble('gameBubble', voiceLines.streak5[randInt(0, voiceLines.streak5.length - 1)], 2500); speakRandom('streak5'); }
+        if (state.streak === 10) { playMilestoneSound(); showBubble('gameBubble', voiceLines.streak10[randInt(0, voiceLines.streak10.length - 1)], 2500); speakRandom('streak10'); }
+        if (state.questionsCorrect % CONFIG.GAME.milestoneInterval === 0) {
+          if (state.questionsCorrect === 5) { playMilestoneSound(); showBubble('gameBubble', voiceLines.milestone5[randInt(0, voiceLines.milestone5.length - 1)], 2500); speakRandom('milestone5'); }
+          if (state.questionsCorrect === 10) { playMilestoneSound(); showBubble('gameBubble', voiceLines.milestone10[randInt(0, voiceLines.milestone10.length - 1)], 2500); speakRandom('milestone10'); }
+        }
+        if (state.streak % 3 === 0 && state.level < CONFIG.GAME.levelCap) { state.level++; showBubble('gameBubble', 'Level Up! ⬆️', 2000); playLevelUpSound(); }
+        if (state.questionsCorrect % 5 === 0 && state.questionsCorrect > 0) { document.getElementById('labubuHat').classList.add('show'); showBubble('gameBubble', `${state.questionsCorrect} stars! 🌟`, 2500); playMilestoneSound(); setTimeout(() => document.getElementById('labubuHat').classList.remove('show'), 3000); }
+        setLabubuState('gameLabubu', 'happy');
+        showFeedback(true);
+        playCorrectSound();
+        starCollectAnim(window.innerWidth / 2, window.innerHeight / 3);
+        speak(`Correct! It's ${state.correctAnswer}!`);
+        debouncedSaveGameState();
+      } else {
+        inputEl.classList.add('wrong');
+        state.streak = 0; state.wrongStreak++;
+        if (state.wrongStreak >= 2 && state.level > 1) { state.level = Math.max(1, state.level - 1); }
+        setLabubuState('gameLabubu', 'sad');
+        showFeedback(false);
+        playWrongSound();
+        speak(`The answer is ${state.correctAnswer}`);
+      }
+      state.questionsAnswered++;
+      updateUI();
+      setTimeout(() => {
+        if (state.questionsAnswered >= state.totalQuestions) { showSummary(); }
+        else {
+          if (state.questionsAnswered % 3 === 0) { const regions = ['capitals', 'landmarks', 'continents', 'usStates']; state.geographyRegion = regions[randInt(0, 3)]; }
+          generateGeographyProblem();
+          state.waiting = false;
+        }
+      }, CONFIG.TIMING.feedback);
+    }
+
+    function checkGeographyAnswer(userInput) {
+      const normalized = userInput.trim().toLowerCase();
+      const correctLower = state.correctAnswer.toLowerCase();
+      if (normalized === correctLower) return true;
+      if (state.currentGeographyProblem.variations && state.currentGeographyProblem.variations.includes(normalized)) return true;
+      const noPunct = normalized.replace(/[.,!?&-]/g, '').trim();
+      const correctNoPunct = correctLower.replace(/[.,!?&-]/g, '').trim();
+      if (noPunct === correctNoPunct) return true;
+      return false;
+    }
+
     // ===== GAME START =====
     function startGame(operation) {
       if (operation === 'spelling') {
@@ -5813,6 +6068,33 @@
         setTimeout(() => {
           speak("Let's explore science! 🔬");
           generateScienceProblem();
+        }, 500);
+        return;
+      }
+
+      if (operation === 'geography') {
+        state.operation = 'geography';
+        state.geographyRegion = '';
+        state.score = 0; state.streak = 0; state.bestStreak = 0;
+        state.level = 1; state.questionsAnswered = 0; state.questionsCorrect = 0;
+        state.totalQuestions = 10;
+        state.waiting = false;
+        state.hintsUsed = 0;
+        state.wrongStreak = 0;
+
+        updateUI();
+        showScreen('gameScreen');
+        document.getElementById('gameScreen').className = 'screen active geography-mode';
+
+        setLabubuState('gameLabubu', 'idle');
+        document.getElementById('labubuHat').classList.remove('show');
+        hideFeedback();
+        updateHintButton();
+
+        playGameStartSound();
+        setTimeout(() => {
+          speak("Let's explore the world! 🌍");
+          generateGeographyProblem();
         }, 500);
         return;
       }
@@ -6119,6 +6401,28 @@
         const hint = hints[Math.min(state.hintsUsed - 1, hints.length - 1)];
         showBubble('gameBubble', hint, 2500);
         speak(hint.replace(/💡/g, ''));
+      } else if (state.operation === 'geography') {
+        const problem = state.currentGeographyProblem;
+        const cluesContainer = document.getElementById('geographyClues');
+        const clueElements = cluesContainer.querySelectorAll('.geography-clue');
+        const revealedCount = Array.from(clueElements).filter(el => !el.classList.contains('revealed')).length;
+
+        if (revealedCount < problem.clues.length) {
+          // Reveal next clue
+          for (let i = 0; i < clueElements.length; i++) {
+            if (clueElements[i].classList.contains('revealed')) continue;
+            if (i > 0) {
+              clueElements[i].classList.remove('revealed');
+              const nextClue = problem.clues[i];
+              speak(nextClue, 0.9);
+              showBubble('gameBubble', `💡 ${nextClue}`, 2500);
+            }
+            break;
+          }
+        } else {
+          showBubble('gameBubble', `The answer is ${problem.correctAnswer}! 💡`, 2500);
+          speak(`The answer is ${problem.correctAnswer}`);
+        }
       }
     }
 
@@ -6570,6 +6874,14 @@
     document.getElementById('playerName').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') goToSelect();
     });
+
+    // Geography input Enter key support
+    const geographyInput = document.getElementById('geographyInput');
+    if (geographyInput) {
+      geographyInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') submitGeographyAnswer();
+      });
+    }
 
     // ===== INITIALIZATION =====
     document.addEventListener('DOMContentLoaded', () => {

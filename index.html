@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <title>Labubu Math Adventure!</title>
   <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Nunito:wght@700;900&display=swap"
     rel="stylesheet">
@@ -37,7 +37,20 @@
       overflow-x: hidden;
       color: #4A4A6A;
       user-select: none;
-      animation: bgShift 20s ease-in-out infinite;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .bg-elements {
+        animation: bgShift 20s ease-in-out infinite;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
 
     @keyframes bgShift {
@@ -63,6 +76,7 @@
       pointer-events: none;
       z-index: 0;
       overflow: hidden;
+      will-change: filter;
     }
 
     .cloud {
@@ -127,11 +141,11 @@
 
     @keyframes floatCloud {
       from {
-        left: -150px;
+        transform: translateX(-150px);
       }
 
       to {
-        left: 110%;
+        transform: translateX(110vw);
       }
     }
 
@@ -205,6 +219,7 @@
       font-size: 20px;
       opacity: 0.15;
       animation: floatStar linear infinite;
+      will-change: transform;
     }
 
     @keyframes floatStar {
@@ -962,6 +977,12 @@
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
       position: relative;
       overflow: hidden;
+      touch-action: manipulation;
+      min-height: 48px;
+      min-width: 120px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .btn::after {
@@ -2671,6 +2692,11 @@
       100% { transform: scale(1) rotate(0deg); }
     }
 
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
     /* Mobile responsive for dressup */
     @media (max-width: 640px) {
       .dressup-top {
@@ -2976,8 +3002,17 @@
     </div>
   </div>
 
+  <!-- ==================== SPLASH SCREEN ==================== -->
+  <div class="screen active" id="splashScreen" style="background: linear-gradient(135deg, #FFE6F0 0%, #E8D5F5 100%); z-index: 1000;">
+    <div style="text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 20px; animation: bounce 1.5s ease-in-out infinite;">⭐</div>
+      <h2 style="color: #4A4A6A; margin-bottom: 10px;">Labubu Adventure</h2>
+      <p style="color: #6A6A8A; font-size: 1.1rem;">Loading magic...</p>
+    </div>
+  </div>
+
   <!-- ==================== WELCOME ==================== -->
-  <div class="screen active" id="welcomeScreen">
+  <div class="screen" id="welcomeScreen">
     <div class="labubu idle wave" id="welcomeLabubu">
       <div class="speech-bubble" id="welcomeBubble">Hi there! Let's do math!</div>
       <div class="labubu-body">
@@ -3518,6 +3553,14 @@
   </div>
 
   <script>
+    // ===== CONFIG & CONSTANTS =====
+    const CONFIG = {
+      TIMING: { feedback: 3000, thinking: 5000, transition: 800, levelUp: 500, minThinkTime: 800 },
+      GAME: { levelCap: 3, milestoneInterval: 5, streakThresholds: [3, 5, 10] },
+      EFFECTS: { confettiCount: 50, starCount: 8 },
+      ANIMATION: { bgShift: '20s', cloudDurations: [25, 35, 30, 40], starFloat: 8 }
+    };
+
     // ===== AUDIO =====
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
@@ -3539,71 +3582,48 @@
       freqs.forEach(f => playTone(f, duration, type, volume));
     }
 
-    function playCorrectSound() {
-      playChord([523, 659, 784], 0.1, 'sine', 0.06);
-      setTimeout(() => playChord([659, 784, 1047], 0.25, 'sine', 0.08), 120);
-    }
+    const SoundFactory = {
+      correct: () => { playChord([523, 659, 784], 0.1, 'sine', 0.06); setTimeout(() => playChord([659, 784, 1047], 0.25, 'sine', 0.08), 120); },
+      wrong: () => { playTone(330, 0.25, 'triangle', 0.08); setTimeout(() => playTone(311, 0.3, 'triangle', 0.08), 130); },
+      click: () => playTone(660 + Math.random() * 200, 0.04, 'sine', 0.04),
+      levelUp: () => {
+        const notes = [523, 587, 659, 698, 784, 880, 988, 1047];
+        notes.forEach((f, i) => setTimeout(() => { playTone(f, 0.15, 'sine', 0.1); if (i > 4) playTone(f * 0.5, 0.15, 'sine', 0.05); }, i * 80));
+      },
+      streak: () => {
+        const notes = [523, 659, 784, 1047];
+        notes.forEach((f, i) => setTimeout(() => playChord([f, f * 1.25], 0.12, 'sine', 0.08), i * 60));
+      },
+      milestone: () => {
+        const fanfare = [784, 784, 784, 1047], dur = [0.08, 0.08, 0.08, 0.4];
+        let t = 0; fanfare.forEach((f, i) => { setTimeout(() => { playTone(f, dur[i], 'sine', 0.12); playTone(f * 0.5, dur[i], 'sine', 0.06); }, t); t += dur[i] * 500; });
+      },
+      encouragement: () => { playChord([349, 440, 523], 0.3, 'sine', 0.06); setTimeout(() => playChord([392, 494, 587], 0.4, 'sine', 0.07), 200); },
+      comboBreaker: () => {
+        const freqs = [262, 330, 392, 523, 659, 784, 1047, 1319];
+        freqs.forEach((f, i) => setTimeout(() => { playTone(f, 0.1, 'square', 0.04); playTone(f * 2, 0.06, 'sine', 0.03); }, i * 45));
+      },
+      gameStart: () => {
+        const melody = [523, 659, 784, 1047, 784, 1047];
+        melody.forEach((f, i) => setTimeout(() => playTone(f, 0.12, 'sine', 0.1), i * 100));
+      },
+      summary: () => {
+        const melody = [523, 659, 784, 659, 784, 1047, 1319];
+        melody.forEach((f, i) => setTimeout(() => { playTone(f, 0.2, 'sine', 0.08); if (i >= 4) playTone(f * 0.5, 0.2, 'sine', 0.04); }, i * 150));
+      }
+    };
 
-    function playWrongSound() {
-      playTone(330, 0.25, 'triangle', 0.08);
-      setTimeout(() => playTone(311, 0.3, 'triangle', 0.08), 130);
-    }
-
-    function playClickSound() {
-      playTone(660 + Math.random() * 200, 0.04, 'sine', 0.04);
-    }
-
-    function playLevelUpSound() {
-      const notes = [523, 587, 659, 698, 784, 880, 988, 1047];
-      notes.forEach((f, i) => setTimeout(() => {
-        playTone(f, 0.15, 'sine', 0.1);
-        if (i > 4) playTone(f * 0.5, 0.15, 'sine', 0.05); // bass harmony
-      }, i * 80));
-    }
-
-    function playStreakSound() {
-      const notes = [523, 659, 784, 1047];
-      notes.forEach((f, i) => setTimeout(() => playChord([f, f * 1.25], 0.12, 'sine', 0.08), i * 60));
-    }
-
-    function playMilestoneSound() {
-      const fanfare = [784, 784, 784, 1047];
-      const durations = [0.08, 0.08, 0.08, 0.4];
-      let t = 0;
-      fanfare.forEach((f, i) => {
-        setTimeout(() => {
-          playTone(f, durations[i], 'sine', 0.12);
-          playTone(f * 0.5, durations[i], 'sine', 0.06);
-        }, t);
-        t += durations[i] * 500;
-      });
-    }
-
-    function playEncouragementSound() {
-      playChord([349, 440, 523], 0.3, 'sine', 0.06);
-      setTimeout(() => playChord([392, 494, 587], 0.4, 'sine', 0.07), 200);
-    }
-
-    function playComboBreaker() {
-      const freqs = [262, 330, 392, 523, 659, 784, 1047, 1319];
-      freqs.forEach((f, i) => setTimeout(() => {
-        playTone(f, 0.1, 'square', 0.04);
-        playTone(f * 2, 0.06, 'sine', 0.03);
-      }, i * 45));
-    }
-
-    function playGameStartSound() {
-      const melody = [523, 659, 784, 1047, 784, 1047];
-      melody.forEach((f, i) => setTimeout(() => playTone(f, 0.12, 'sine', 0.1), i * 100));
-    }
-
-    function playSummarySound() {
-      const melody = [523, 659, 784, 659, 784, 1047, 1319];
-      melody.forEach((f, i) => setTimeout(() => {
-        playTone(f, 0.2, 'sine', 0.08);
-        if (i >= 4) playTone(f * 0.5, 0.2, 'sine', 0.04);
-      }, i * 150));
-    }
+    // Backward compatibility aliases
+    const playCorrectSound = () => SoundFactory.correct();
+    const playWrongSound = () => SoundFactory.wrong();
+    const playClickSound = () => SoundFactory.click();
+    const playLevelUpSound = () => SoundFactory.levelUp();
+    const playStreakSound = () => SoundFactory.streak();
+    const playMilestoneSound = () => SoundFactory.milestone();
+    const playEncouragementSound = () => SoundFactory.encouragement();
+    const playComboBreaker = () => SoundFactory.comboBreaker();
+    const playGameStartSound = () => SoundFactory.gameStart();
+    const playSummarySound = () => SoundFactory.summary();
 
     // ===== VOICE =====
     const voiceLines = {
@@ -4041,6 +4061,13 @@
           console.error("Failed to load save", e);
         }
       }
+    }
+
+    // Debounced save to reduce localStorage writes
+    let saveTimer;
+    function debouncedSaveGameState() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveGameState(), 2000);
     }
 
     // ===== THEMES & ITEMS =====
@@ -4817,7 +4844,7 @@
             if (!state.waiting) setLabubuState('gameLabubu', 'idle');
           }, 2500);
         }
-      }, 8000);
+      }, CONFIG.TIMING.thinking);
     }
 
     // ===== SITE WORDS =====
@@ -4909,7 +4936,7 @@
           setTimeout(() => document.getElementById('labubuHat').classList.remove('show'), 3000);
         }
 
-        saveGameState(); // Save on every correct answer to be safe
+        debouncedSaveGameState(); // Save progress (debounced)
 
       } else {
         // WRONG
@@ -5128,7 +5155,7 @@
           showBubble('gameBubble', 'Level Up! ⬆️', 2000);
         }
 
-        saveGameState();
+        debouncedSaveGameState();
       } else {
         btn.classList.add('wrong');
         state.streak = 0; state.wrongStreak++;
@@ -5354,7 +5381,7 @@
           showBubble('gameBubble', 'Level Up! ⬆️', 2000);
         }
 
-        saveGameState(); // Save progress
+        debouncedSaveGameState(); // Save progress (debounced)
 
       } else {
         // Wrong
@@ -6206,6 +6233,20 @@
     // ===== NAME INPUT =====
     document.getElementById('playerName').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') goToSelect();
+    });
+
+    // ===== INITIALIZATION =====
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const splash = document.getElementById('splashScreen');
+        if (splash) {
+          splash.style.animation = 'screenIn 0.4s ease-out forwards';
+          setTimeout(() => {
+            splash.classList.remove('active');
+            document.getElementById('welcomeScreen').classList.add('active');
+          }, 800);
+        }
+      }, 500);
     });
   </script>
 </body>

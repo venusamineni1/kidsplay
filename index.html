@@ -3053,7 +3053,7 @@
   <!-- ==================== SPLASH SCREEN ==================== -->
   <div class="screen active" id="splashScreen" style="background: linear-gradient(135deg, #FFE6F0 0%, #E8D5F5 100%); z-index: 1000;">
     <div style="text-align: center;">
-      <div id="themeLogo" style="font-size: 3rem; margin-bottom: 20px; animation: bounce 1.5s ease-in-out infinite;">⭐</div>
+      <img id="themeLogo" src="images/krishna.jpg" style="width: 150px; height: 150px; margin-bottom: 20px; animation: bounce 1.5s ease-in-out infinite; object-fit: contain;">
       <h2 id="themeTitle" style="color: #4A4A6A; margin-bottom: 10px;">Labubu Adventure</h2>
       <p id="themeSubtitle" style="color: #6A6A8A; font-size: 1.1rem;">Loading magic...</p>
     </div>
@@ -6962,6 +6962,7 @@
       const themes = {
         'default': {
           logo: '⭐',
+          logoImage: 'images/krishna.jpg',
           title: 'Labubu Adventure',
           subtitle: 'Loading magic...',
           titleColor: '#4A4A6A',
@@ -6969,6 +6970,7 @@
         },
         'bheem-theme': {
           logo: '💪',
+          logoImage: 'images/bheem.png',
           title: 'Bheem Adventure',
           subtitle: 'Be Strong! 🦸‍♂️',
           titleColor: '#8B4513',
@@ -6976,6 +6978,7 @@
         },
         'krishna-theme': {
           logo: '🪶',
+          logoImage: 'images/krishna.jpg',
           title: 'Krishna Adventure',
           subtitle: 'Divine Learning! 💛',
           titleColor: '#FFD700',
@@ -6984,7 +6987,14 @@
       };
 
       const theme = themes[themeName] || themes['default'];
-      logoEl.textContent = theme.logo;
+
+      // Update logo image
+      if (logoEl.tagName === 'IMG') {
+        logoEl.src = theme.logoImage;
+        logoEl.alt = theme.title;
+      } else {
+        logoEl.textContent = theme.logo;
+      }
 
       if (titleEl) {
         titleEl.textContent = theme.title;

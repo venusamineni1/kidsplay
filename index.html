@@ -319,6 +319,24 @@
       }
     }
 
+    /* Show theme logos on welcome and select screens */
+    #welcomeScreen.active #welcomeThemeLogo,
+    #selectScreen.active #selectThemeLogo {
+      display: inline-block !important;
+      animation: slideDown 0.5s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     /* ===== LABUBU CHARACTER ===== */
     .labubu {
       position: relative;
@@ -3087,6 +3105,7 @@
         <div class="labubu-foot right"></div>
       </div>
     </div>
+    <img id="welcomeThemeLogo" src="images/krishna.jpg" style="width: 100px; height: 100px; margin: 10px 0; border-radius: 10px; object-fit: cover; display: none;">
     <h1 class="welcome-title">Labubu Math<br>Adventure!</h1>
     <p class="welcome-subtitle">Learn math with your friend Labubu!</p>
     <div class="name-input-wrap">
@@ -3123,6 +3142,7 @@
         <div class="labubu-foot right"></div>
       </div>
     </div>
+    <img id="selectThemeLogo" src="images/krishna.jpg" style="width: 100px; height: 100px; margin: 10px 0; border-radius: 10px; object-fit: cover; display: none;">
     <h2 class="select-title" id="selectTitle">Pick a challenge!</h2>
     <div class="ops-grid">
       <button class="op-btn add" onclick="startGame('add')"><span class="op-icon">➕</span>Addition</button>
@@ -6954,10 +6974,10 @@
 
     function updateThemeLogo(themeName) {
       const logoEl = document.getElementById('themeLogo');
+      const welcomeLogoEl = document.getElementById('welcomeThemeLogo');
+      const selectLogoEl = document.getElementById('selectThemeLogo');
       const titleEl = document.getElementById('themeTitle');
       const subtitleEl = document.getElementById('themeSubtitle');
-
-      if (!logoEl) return;
 
       const themes = {
         'default': {
@@ -6988,12 +7008,26 @@
 
       const theme = themes[themeName] || themes['default'];
 
-      // Update logo image
-      if (logoEl.tagName === 'IMG') {
-        logoEl.src = theme.logoImage;
-        logoEl.alt = theme.title;
-      } else {
-        logoEl.textContent = theme.logo;
+      // Update splash screen logo
+      if (logoEl) {
+        if (logoEl.tagName === 'IMG') {
+          logoEl.src = theme.logoImage;
+          logoEl.alt = theme.title;
+        } else {
+          logoEl.textContent = theme.logo;
+        }
+      }
+
+      // Update welcome screen logo
+      if (welcomeLogoEl) {
+        welcomeLogoEl.src = theme.logoImage;
+        welcomeLogoEl.alt = theme.title;
+      }
+
+      // Update select screen logo
+      if (selectLogoEl) {
+        selectLogoEl.src = theme.logoImage;
+        selectLogoEl.alt = theme.title;
       }
 
       if (titleEl) {

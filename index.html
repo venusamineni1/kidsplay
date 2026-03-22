@@ -37,6 +37,54 @@
       overflow-x: hidden;
       color: #4A4A6A;
       user-select: none;
+      transition: background 1s ease;
+    }
+
+    /* ===== THEME SYSTEM ===== */
+    body.bheem-theme {
+      background: linear-gradient(135deg, #FF9500 0%, #FFD700 25%, #FF6B35 50%, #FFA500 75%, #FFB84D 100%);
+    }
+
+    body.krishna-theme {
+      background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 25%, #FFD700 50%, #1E40AF 75%, #2563EB 100%);
+    }
+
+    body.bheem-theme .labubu {
+      filter: hue-rotate(25deg) saturate(1.4);
+    }
+
+    body.krishna-theme .labubu {
+      filter: hue-rotate(200deg) saturate(1.2);
+    }
+
+    body.bheem-theme .op-btn,
+    body.bheem-theme .numpad button,
+    body.bheem-theme button {
+      background: linear-gradient(135deg, #FF9500, #FFD700) !important;
+      color: white;
+    }
+
+    body.krishna-theme .op-btn,
+    body.krishna-theme .numpad button,
+    body.krishna-theme button {
+      background: linear-gradient(135deg, #1E3A8A, #3B82F6) !important;
+      color: #FFD700;
+    }
+
+    body.bheem-theme .heading,
+    body.bheem-theme h1,
+    body.bheem-theme h2,
+    body.bheem-theme h3 {
+      color: #8B4513;
+      text-shadow: 2px 2px 4px rgba(255, 165, 0, 0.3);
+    }
+
+    body.krishna-theme .heading,
+    body.krishna-theme h1,
+    body.krishna-theme h2,
+    body.krishna-theme h3 {
+      color: #FFD700;
+      text-shadow: 2px 2px 4px rgba(30, 58, 138, 0.3);
     }
 
     @media (prefers-reduced-motion: no-preference) {
@@ -3555,6 +3603,7 @@
   <div class="screen" id="gameScreen">
     <button class="quit-btn" onclick="quitGame()">← Back</button>
     <button class="voice-toggle" id="voiceToggle" onclick="toggleVoice()">🔊</button>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Change theme" style="position: absolute; top: 15px; right: 70px; background: linear-gradient(135deg, #FF9500, #3B82F6); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">🎨</button>
     <button class="read-btn" id="readBtn" onclick="readCurrentWord()">👂 Read Word</button>
 
     <div class="game-header">
@@ -6883,8 +6932,74 @@
       });
     }
 
+    // ===== THEME SYSTEM =====
+    let themeRotationInterval = null;
+    const THEMES = ['default', 'bheem-theme', 'krishna-theme'];
+    let currentThemeIndex = 0;
+
+    function getNextTheme() {
+      currentThemeIndex = (currentThemeIndex + 1) % THEMES.length;
+      return THEMES[currentThemeIndex];
+    }
+
+    function applyTheme(themeName) {
+      document.body.className = document.body.className.replace(/\b(default|bheem-theme|krishna-theme)\b/g, '').trim();
+      if (themeName !== 'default') {
+        document.body.classList.add(themeName);
+      }
+      localStorage.setItem('selectedTheme', themeName);
+      updateThemeButton();
+    }
+
+    function toggleTheme() {
+      stopAutoThemeRotation();
+      const nextTheme = getNextTheme();
+      applyTheme(nextTheme);
+    }
+
+    function startAutoThemeRotation() {
+      if (themeRotationInterval) return;
+      themeRotationInterval = setInterval(() => {
+        const nextTheme = getNextTheme();
+        applyTheme(nextTheme);
+      }, 10000); // 10 seconds
+    }
+
+    function stopAutoThemeRotation() {
+      if (themeRotationInterval) {
+        clearInterval(themeRotationInterval);
+        themeRotationInterval = null;
+      }
+    }
+
+    function updateThemeButton() {
+      const btn = document.getElementById('themeToggle');
+      if (btn) {
+        const currentTheme = THEMES[currentThemeIndex];
+        if (currentTheme === 'bheem-theme') {
+          btn.style.background = 'linear-gradient(135deg, #FF9500, #FFD700)';
+          btn.title = '🎨 Chota Bheem Theme - Click to change';
+        } else if (currentTheme === 'krishna-theme') {
+          btn.style.background = 'linear-gradient(135deg, #1E3A8A, #3B82F6)';
+          btn.title = '🎨 Little Krishna Theme - Click to change';
+        } else {
+          btn.style.background = 'linear-gradient(135deg, #FFE6F0, #E8D5F5)';
+          btn.title = '🎨 Default Theme - Click to change';
+        }
+      }
+    }
+
+    function initializeTheme() {
+      const savedTheme = localStorage.getItem('selectedTheme') || 'default';
+      const themeIndex = THEMES.indexOf(savedTheme);
+      currentThemeIndex = themeIndex >= 0 ? themeIndex : 0;
+      applyTheme(THEMES[currentThemeIndex]);
+      startAutoThemeRotation();
+    }
+
     // ===== INITIALIZATION =====
     document.addEventListener('DOMContentLoaded', () => {
+      initializeTheme();
       setTimeout(() => {
         const splash = document.getElementById('splashScreen');
         if (splash) {

@@ -6373,23 +6373,6 @@
         // Read the correct answer aloud
         speak(state.correctAnswer, 0.8, 1.3);
         showBubble('gameBubble', `Listen... "${state.correctAnswer}" 💡`, 2500);
-      } else {
-        // Math mode
-        const answer = state.correctAnswer;
-        if (state.hintsUsed === 1) {
-          const low = Math.max(0, answer - randInt(2, 5));
-          const high = answer + randInt(2, 5);
-          showBubble('gameBubble', `Between ${low} and ${high} 💡`, 3000);
-          speak(`The answer is between ${low} and ${high}`);
-        } else {
-          if (answer % 2 === 0) {
-            showBubble('gameBubble', "It's an even number! 💡", 2500);
-            speak("It's an even number!");
-          } else {
-            showBubble('gameBubble', "It's an odd number! 💡", 2500);
-            speak("It's an odd number!");
-          }
-        }
       } else if (state.operation === 'science') {
         // Science hint - give general clues
         const hints = [
@@ -6422,6 +6405,23 @@
         } else {
           showBubble('gameBubble', `The answer is ${problem.correctAnswer}! 💡`, 2500);
           speak(`The answer is ${problem.correctAnswer}`);
+        }
+      } else {
+        // Math mode
+        const answer = state.correctAnswer;
+        if (state.hintsUsed === 1) {
+          const low = Math.max(0, answer - randInt(2, 5));
+          const high = answer + randInt(2, 5);
+          showBubble('gameBubble', `Between ${low} and ${high} 💡`, 3000);
+          speak(`The answer is between ${low} and ${high}`);
+        } else {
+          if (answer % 2 === 0) {
+            showBubble('gameBubble', "It's an even number! 💡", 2500);
+            speak("It's an even number!");
+          } else {
+            showBubble('gameBubble', "It's an odd number! 💡", 2500);
+            speak("It's an odd number!");
+          }
         }
       }
     }
